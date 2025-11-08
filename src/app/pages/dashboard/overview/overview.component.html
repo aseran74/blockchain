@@ -1,0 +1,145 @@
+<section class="space-y-8">
+  <header class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Panel de operación PnV</h1>
+      <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+        Estado en tiempo casi real del consenso paralelo con Supabase como capa de persistencia.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-3">
+      <button
+        type="button"
+        class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-brand-500 hover:text-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 dark:border-gray-700 dark:text-gray-200 dark:hover:border-brand-400 dark:hover:text-brand-300"
+      >
+        <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+        Red estable
+      </button>
+      <button
+        type="button"
+        class="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+      >
+        Nueva transacción
+      </button>
+    </div>
+  </header>
+
+  <section class="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+    @for (metric of metrics(); track metric.label) {
+      <article
+        class="relative overflow-hidden rounded-2xl border border-gray-100 bg-white/80 p-6 shadow-sm backdrop-blur-xl transition hover:-translate-y-0.5 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900"
+      >
+        <div class="space-y-3">
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+            {{ metric.label }}
+          </p>
+          <div class="flex items-end justify-between gap-3">
+            <span class="text-3xl font-semibold text-gray-900 dark:text-white">
+              {{ metric.value }}
+            </span>
+            @if (metric.delta) {
+              <span
+                class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium"
+                [ngClass]="metric.delta.positive ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300' : 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-300'"
+              >
+                <span
+                  class="inline-flex h-2 w-2 rounded-full"
+                  [ngClass]="metric.delta.positive ? 'bg-emerald-500' : 'bg-rose-500'"
+                ></span>
+                {{ metric.delta.value }}
+              </span>
+            }
+          </div>
+        </div>
+      </article>
+    }
+  </section>
+
+  <section class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+    <article class="xl:col-span-2">
+      <div class="rounded-2xl border border-gray-100 bg-white/80 p-6 shadow-sm backdrop-blur-xl dark:border-gray-800 dark:bg-gray-900">
+        <header class="mb-4 flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Bloques recientes</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Resumen de los últimos grupos generados por los bookkeepers.</p>
+          </div>
+          <button
+            type="button"
+            class="rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:border-brand-500 hover:text-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:border-gray-700 dark:text-gray-200 dark:hover:border-brand-400"
+          >
+            Ver historial
+          </button>
+        </header>
+
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-800">
+            <thead class="text-left text-xs uppercase text-gray-500 dark:text-gray-400">
+              <tr>
+                <th class="px-4 py-3 font-medium">Grupo</th>
+                <th class="px-4 py-3 font-medium">Líder</th>
+                <th class="px-4 py-3 font-medium">Latencia</th>
+                <th class="px-4 py-3 font-medium">Tx</th>
+                <th class="px-4 py-3 font-medium text-right">Estado</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 text-gray-700 dark:divide-gray-800 dark:text-gray-200">
+              @for (group of blockGroups(); track group.id) {
+                <tr class="hover:bg-gray-50/60 dark:hover:bg-white/5">
+                  <td class="px-4 py-3 font-medium text-gray-900 dark:text-white">{{ group.id }}</td>
+                  <td class="px-4 py-3">{{ group.leader }}</td>
+                  <td class="px-4 py-3">{{ group.latency }}</td>
+                  <td class="px-4 py-3">{{ group.txCount }}</td>
+                  <td class="px-4 py-3 text-right">
+                    <span
+                      class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium"
+                      [ngClass]="group.statusKind === 'confirmed'
+                        ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300'
+                        : 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-300'"
+                    >
+                      <span
+                        class="h-2 w-2 rounded-full"
+                        [ngClass]="group.statusKind === 'confirmed' ? 'bg-emerald-500' : 'bg-amber-500'"
+                      ></span>
+                      {{ group.statusLabel }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </article>
+
+    <article class="space-y-6 rounded-2xl border border-gray-100 bg-white/80 p-6 shadow-sm backdrop-blur-xl dark:border-gray-800 dark:bg-gray-900">
+      <header>
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Validadores y votantes</h2>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Rendimiento y stake observado de los actores críticos del protocolo PnV.
+        </p>
+      </header>
+
+      <ul class="space-y-4">
+        @for (validator of validators(); track validator.name) {
+          <li class="rounded-xl border border-gray-100 p-4 transition hover:border-brand-200 dark:border-gray-800 dark:hover:border-brand-500/40">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ validator.name }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">{{ validator.role }}</p>
+                <p class="mt-2 text-xs font-medium text-brand-600 dark:text-brand-300">Stake: {{ validator.stake }}</p>
+              </div>
+              <span class="rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-600 dark:bg-brand-500/10 dark:text-brand-300">
+                {{ validator.performance }}% uptime
+              </span>
+            </div>
+          </li>
+        }
+      </ul>
+
+      <footer class="rounded-lg bg-gray-50 px-4 py-3 text-xs text-gray-500 dark:bg-white/5 dark:text-gray-400">
+        Supervisión automática cada ~5 segundos. Datos almacenados de forma persistente en Supabase para auditoría y recuperación.
+      </footer>
+    </article>
+  </section>
+</section>
+

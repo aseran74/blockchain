@@ -1179,6 +1179,59 @@ export interface Database {
             Args: { p_voter_id: string };
             Returns: { success: boolean; message: string; error?: string };
           };
+          init_smart_contracts: {
+            Args: Record<string, never>;
+            Returns: { success: boolean; contracts_created: number; certificates_created: number };
+          };
+          get_smart_contracts_with_certificates: {
+            Args: Record<string, never>;
+            Returns: Array<{
+              id: string;
+              contract_number: string;
+              contract_type: string;
+              buyer_name: string;
+              seller_name: string;
+              product_description: string;
+              amount: number;
+              currency: string;
+              contract_date: string;
+              delivery_date: string | null;
+              status: string;
+              blockchain_hash: string;
+              block_number: number;
+              created_at: string;
+              certificates: Array<{
+                id: string;
+                certificate_type: string;
+                certificate_name: string;
+                certificate_number: string;
+                issuing_organization: string;
+                issue_date: string;
+                expiry_date: string;
+                is_valid: boolean;
+                blockchain_hash: string;
+                block_number: number;
+                verified: boolean;
+                verified_at: string | null;
+              }>;
+            }>;
+          };
+          validate_certificate: {
+            Args: { p_certificate_id: string };
+            Returns: {
+              success: boolean;
+              certificate_id: string;
+              certificate_number: string;
+              certificate_name: string;
+              is_valid: boolean;
+              blockchain_hash: string;
+              block_number: number;
+              contract_number: string;
+              contract_hash: string;
+              message: string;
+              error?: string;
+            };
+          };
         };
     Enums: {
       pnv_actor_status: 'active' | 'inactive' | 'banned';

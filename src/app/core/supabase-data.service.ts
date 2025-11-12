@@ -357,6 +357,27 @@ export class SupabaseDataService {
     ).pipe(map(this.unwrapResponse));
   }
 
+  // Smart Contracts
+  initSmartContracts() {
+    return from(
+      this.supabase.rpc('init_smart_contracts')
+    ).pipe(map(this.unwrapResponse));
+  }
+
+  getSmartContractsWithCertificates() {
+    return from(
+      this.supabase.rpc('get_smart_contracts_with_certificates')
+    ).pipe(map(this.unwrapResponse));
+  }
+
+  validateCertificate(certificateId: string) {
+    return from(
+      this.supabase.rpc('validate_certificate', {
+        p_certificate_id: certificateId
+      })
+    ).pipe(map(this.unwrapResponse));
+  }
+
   sendSecondSms() {
     return from(
       this.supabase.rpc('send_second_sms')

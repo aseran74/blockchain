@@ -19,6 +19,11 @@ const readEnv = (key: string): string | undefined => {
     return metaEnv[key];
   }
 
+  const windowEnv = (globalThis as unknown as { __env?: Record<string, string | undefined> }).__env;
+  if (windowEnv?.[key]) {
+    return windowEnv[key];
+  }
+
   const fromGlobal = (globalThis as unknown as Record<string, string | undefined>)[key];
   return fromGlobal;
 };
@@ -49,6 +54,8 @@ export const SUPABASE_CLIENT = new InjectionToken<SupabaseClient<Database>>('SUP
     return createClient<Database>(url, anonKey, {
       auth: {
         persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
       },
     });
   },

@@ -3,7 +3,6 @@ import { Component, ElementRef, QueryList, ViewChildren, ChangeDetectorRef } fro
 import { SidebarService } from '../../services/sidebar.service';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { SafeHtmlPipe } from '../../pipe/safe-html.pipe';
-import { SidebarWidgetComponent } from './app-sidebar-widget.component';
 import { combineLatest, Subscription } from 'rxjs';
 
 type NavItem = {
@@ -19,8 +18,7 @@ type NavItem = {
   imports: [
     CommonModule,
     RouterModule,
-    SafeHtmlPipe,
-    SidebarWidgetComponent
+    SafeHtmlPipe
   ],
   templateUrl: './app-sidebar.component.html',
 })
@@ -32,7 +30,7 @@ export class AppSidebarComponent {
       icon: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.75 6.5C4.75 5.25736 5.75736 4.25 7 4.25H17C18.2426 4.25 19.25 5.25736 19.25 6.5V17.5C19.25 18.7426 18.2426 19.75 17 19.75H7C5.75736 19.75 4.75 18.7426 4.75 17.5V6.5ZM7 5.75C6.58579 5.75 6.25 6.08579 6.25 6.5V8.75H17.75V6.5C17.75 6.08579 17.4142 5.75 17 5.75H7ZM17.75 10.25H6.25V17.5C6.25 17.9142 6.58579 18.25 7 18.25H17C17.4142 18.25 17.75 17.9142 17.75 17.5V10.25Z" fill="currentColor"></path></svg>`,
       name: "Dashboard",
       subItems: [
-        { name: "Resumen", path: "/" },
+        { name: "Resumen", path: "/dashboard" },
       ],
     },
     {
@@ -41,6 +39,7 @@ export class AppSidebarComponent {
       subItems: [
         { name: "Grupos de bloques", path: "/block-groups" },
         { name: "Transacciones", path: "/transactions" },
+        { name: "Proyección TPS global", path: "/global-tps" },
       ],
     },
     {
@@ -49,6 +48,7 @@ export class AppSidebarComponent {
       subItems: [
         { name: "Nodos y roles", path: "/nodes" },
         { name: "Parámetros", path: "/parameters" },
+        { name: "Wallet Votalia", path: "/wallets" },
       ],
     },
     {

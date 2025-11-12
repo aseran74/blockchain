@@ -3,32 +3,24 @@
     <div>
       <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Panel de operación PnV</h1>
       <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-        Estado en tiempo casi real del consenso paralelo con Supabase como capa de persistencia.
+        Estado en tiempo real del consenso PnV sobre Supabase con datos persistentes de la demo.
       </p>
     </div>
 
     <div class="flex flex-wrap items-center gap-3">
-      <button
-        type="button"
-        class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-brand-500 hover:text-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 dark:border-gray-700 dark:text-gray-200 dark:hover:border-brand-400 dark:hover:text-brand-300"
-      >
-        <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+      <div class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200">
+        <span class="inline-flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
         Red estable
-      </button>
-      <button
-        type="button"
-        class="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
-      >
-        Nueva transacción
-      </button>
+      </div>
+      <div class="rounded-lg border border-gray-200 px-4 py-2 text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400">
+        Última actualización: {{ formatTimestamp(system().updated_at) }}
+      </div>
     </div>
   </header>
 
   <section class="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
     @for (metric of metrics(); track metric.label) {
-      <article
-        class="relative overflow-hidden rounded-2xl border border-gray-100 bg-white/80 p-6 shadow-sm backdrop-blur-xl transition hover:-translate-y-0.5 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900"
-      >
+      <article class="relative overflow-hidden rounded-2xl border border-gray-100 bg-white/80 p-6 shadow-sm backdrop-blur-xl transition hover:-translate-y-0.5 hover:shadow-lg dark:border-gray-800 dark:bg-gray-900">
         <div class="space-y-3">
           <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
             {{ metric.label }}
@@ -38,14 +30,7 @@
               {{ metric.value }}
             </span>
             @if (metric.delta) {
-              <span
-                class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium"
-                [ngClass]="metric.delta.positive ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300' : 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-300'"
-              >
-                <span
-                  class="inline-flex h-2 w-2 rounded-full"
-                  [ngClass]="metric.delta.positive ? 'bg-emerald-500' : 'bg-rose-500'"
-                ></span>
+              <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300">
                 {{ metric.delta.value }}
               </span>
             }
@@ -55,91 +40,313 @@
     }
   </section>
 
-  <section class="grid grid-cols-1 gap-6 xl:grid-cols-3">
-    <article class="xl:col-span-2">
-      <div class="rounded-2xl border border-gray-100 bg-white/80 p-6 shadow-sm backdrop-blur-xl dark:border-gray-800 dark:bg-gray-900">
-        <header class="mb-4 flex items-center justify-between">
-          <div>
-            <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Bloques recientes</h2>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Resumen de los últimos grupos generados por los bookkeepers.</p>
+  <section class="rounded-2xl border border-indigo-500/20 bg-indigo-950/20 p-4 shadow-sm dark:border-indigo-500/40">
+    <h2 class="text-sm font-bold text-indigo-200 mb-3">Parámetros del sistema</h2>
+    <div class="grid grid-cols-2 md:grid-cols-6 gap-2 text-xs text-indigo-100">
+      <div class="rounded bg-indigo-900/40 p-2">
+        <div class="text-indigo-300">Nc</div>
+        <div class="text-base font-semibold text-white">{{ system().nc }}</div>
+      </div>
+      <div class="rounded bg-indigo-900/40 p-2">
+        <div class="text-indigo-300">Nb</div>
+        <div class="text-base font-semibold text-white">{{ system().nb }}</div>
+      </div>
+      <div class="rounded bg-indigo-900/40 p-2">
+        <div class="text-indigo-300">Tb</div>
+        <div class="text-base font-semibold text-white">{{ system().tb }} s</div>
+      </div>
+      <div class="rounded bg-indigo-900/40 p-2">
+        <div class="text-indigo-300">Tenure</div>
+        <div class="text-base font-semibold text-white">#{{ system().current_tenure }}</div>
+      </div>
+      <div class="rounded bg-indigo-900/40 p-2">
+        <div class="text-indigo-300">Bloques</div>
+        <div class="text-base font-semibold text-white">{{ system().blocks_in_tenure }}/{{ system().bw }}</div>
+      </div>
+      <div class="rounded bg-indigo-900/40 p-2">
+        <div class="text-indigo-300">Alliance fund</div>
+        <div class="text-base font-semibold text-emerald-300">{{ formatNumber(system().alliance_fund) }}</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="rounded-2xl border border-gray-100 bg-white/70 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900/70">
+    <h2 class="text-sm font-bold text-gray-800 dark:text-gray-100 mb-3 flex items-center gap-2">Balances actuales</h2>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+      @for (balance of balances(); track balance.account) {
+        <div class="rounded bg-gray-100/60 p-2 text-center dark:bg-gray-800/60">
+          <div class="text-xs text-gray-500 dark:text-gray-400">{{ balance.account }}</div>
+          <div class="text-base font-semibold text-emerald-500 dark:text-emerald-300">
+            {{ formatNumber(balance.balance) }}
           </div>
-          <button
-            type="button"
-            class="rounded-lg border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:border-brand-500 hover:text-brand-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:border-gray-700 dark:text-gray-200 dark:hover:border-brand-400"
-          >
-            Ver historial
-          </button>
+        </div>
+      }
+    </div>
+  </section>
+
+  <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+    <div class="space-y-4">
+      <div class="rounded-2xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <header class="mb-3">
+          <h2 class="text-base font-bold text-gray-900 dark:text-white">Consenso PnV (demo)</h2>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            Gestiona el bloque actual en votación y observa cómo los saldos cambian al confirmarse.
+          </p>
         </header>
 
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-800">
-            <thead class="text-left text-xs uppercase text-gray-500 dark:text-gray-400">
-              <tr>
-                <th class="px-4 py-3 font-medium">Grupo</th>
-                <th class="px-4 py-3 font-medium">Líder</th>
-                <th class="px-4 py-3 font-medium">Latencia</th>
-                <th class="px-4 py-3 font-medium">Tx</th>
-                <th class="px-4 py-3 font-medium text-right">Estado</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100 text-gray-700 dark:divide-gray-800 dark:text-gray-200">
-              @for (group of blockGroups(); track group.id) {
-                <tr class="hover:bg-gray-50/60 dark:hover:bg-white/5">
-                  <td class="px-4 py-3 font-medium text-gray-900 dark:text-white">{{ group.id }}</td>
-                  <td class="px-4 py-3">{{ group.leader }}</td>
-                  <td class="px-4 py-3">{{ group.latency }}</td>
-                  <td class="px-4 py-3">{{ group.txCount }}</td>
-                  <td class="px-4 py-3 text-right">
-                    <span
-                      class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium"
-                      [ngClass]="group.statusKind === 'confirmed'
-                        ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300'
-                        : 'bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-300'"
-                    >
-                      <span
-                        class="h-2 w-2 rounded-full"
-                        [ngClass]="group.statusKind === 'confirmed' ? 'bg-emerald-500' : 'bg-amber-500'"
-                      ></span>
-                      {{ group.statusLabel }}
-                    </span>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
+        <div class="grid gap-3 text-xs text-gray-600 dark:text-gray-300 sm:grid-cols-2">
+          <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800/60">
+            <p class="text-[11px] uppercase tracking-wide text-gray-400 dark:text-gray-500">Transacciones pendientes</p>
+            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ pendingTransactions().length }}</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800/60">
+            <p class="text-[11px] uppercase tracking-wide text-gray-400 dark:text-gray-500">Votos necesarios</p>
+            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ requiredVotes() }}</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800/60 sm:col-span-2">
+            @if (currentVotingBlock(); as voting) {
+              <div class="flex flex-col gap-1 text-sm">
+                <span class="font-semibold text-gray-900 dark:text-white">Bloque en curso: #{{ voting.height }}</span>
+                <span>Tx: {{ voting.tx_count || pendingTransactions().length }} • Votos: {{ voting.approved_count ?? 0 }}/{{ requiredVotes() }}</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400">Creado: {{ formatTimestamp(voting.created_at) }}</span>
+              </div>
+            } @else {
+              <div class="text-sm text-gray-600 dark:text-gray-300">
+                No hay bloque en votación. Inicia una ronda para procesar el pool.
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (consensusMessage()) {
+          <div class="mt-3 rounded border border-emerald-400 bg-emerald-500/10 p-3 text-xs font-semibold text-emerald-300">
+            {{ consensusMessage() }}
+          </div>
+        }
+
+        @if (consensusError()) {
+          <div class="mt-3 rounded border border-rose-400 bg-rose-500/10 p-3 text-xs font-semibold text-rose-200">
+            {{ consensusError() }}
+          </div>
+        }
+
+        <div class="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-500"
+            (click)="startConsensusRound()"
+            [disabled]="!canStartConsensus() || isConsensusBusy()"
+          >
+            {{ isConsensusBusy() ? 'Procesando…' : 'Iniciar ronda' }}
+          </button>
+          <button
+            type="button"
+            class="rounded-lg border border-emerald-500 px-4 py-2 text-sm font-semibold text-emerald-600 transition hover:bg-emerald-500/10 dark:border-emerald-400 dark:text-emerald-300"
+            (click)="approveCurrentBlock()"
+            [disabled]="!currentVotingBlock() || isConsensusBusy()"
+          >
+            Aprobar mayoría
+          </button>
+          <button
+            type="button"
+            class="rounded-lg border border-amber-500 px-4 py-2 text-sm font-semibold text-amber-600 transition hover:bg-amber-500/10 dark:border-amber-400 dark:text-amber-300"
+            (click)="finalizeCurrentBlock()"
+            [disabled]="!currentVotingBlock() || isConsensusBusy()"
+          >
+            Forzar commit
+          </button>
         </div>
       </div>
-    </article>
 
-    <article class="space-y-6 rounded-2xl border border-gray-100 bg-white/80 p-6 shadow-sm backdrop-blur-xl dark:border-gray-800 dark:bg-gray-900">
-      <header>
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Validadores y votantes</h2>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Rendimiento y stake observado de los actores críticos del protocolo PnV.
-        </p>
-      </header>
+      <div class="rounded-2xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <h2 class="text-base font-bold text-gray-900 dark:text-white mb-3">Nueva transacción</h2>
 
-      <ul class="space-y-4">
-        @for (validator of validators(); track validator.name) {
-          <li class="rounded-xl border border-gray-100 p-4 transition hover:border-brand-200 dark:border-gray-800 dark:hover:border-brand-500/40">
-            <div class="flex items-start justify-between gap-3">
-              <div>
-                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ validator.name }}</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">{{ validator.role }}</p>
-                <p class="mt-2 text-xs font-medium text-brand-600 dark:text-brand-300">Stake: {{ validator.stake }}</p>
-              </div>
-              <span class="rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-600 dark:bg-brand-500/10 dark:text-brand-300">
-                {{ validator.performance }}% uptime
-              </span>
-            </div>
-          </li>
+        @if (formErrors().length > 0) {
+          <div class="mb-3 rounded border border-red-400 bg-red-500/10 p-3 text-xs text-red-200">
+            @for (error of formErrors(); track $index) {
+              <div>• {{ error }}</div>
+            }
+          </div>
         }
-      </ul>
 
-      <footer class="rounded-lg bg-gray-50 px-4 py-3 text-xs text-gray-500 dark:bg-white/5 dark:text-gray-400">
-        Supervisión automática cada ~5 segundos. Datos almacenados de forma persistente en Supabase para auditoría y recuperación.
-      </footer>
-    </article>
-  </section>
+        @if (formSuccess()) {
+          <div class="mb-3 rounded border border-emerald-400 bg-emerald-500/10 p-3 text-xs text-emerald-200">
+            {{ formSuccess() }}
+          </div>
+        }
+
+        <div class="space-y-2">
+          <select
+            [value]="newTransaction().from"
+            (change)="onTransactionFieldChange('from', $any($event.target).value)"
+            class="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-indigo-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+          >
+            <option value="">Remitente</option>
+            @for (balance of balances(); track balance.account) {
+              <option [value]="balance.account">
+                {{ balance.account }} ({{ formatNumber(balance.balance) }})
+              </option>
+            }
+          </select>
+
+          <div class="space-y-2">
+            <select
+              [value]="recipientMode() === 'new' ? '__new' : newTransaction().to"
+              (change)="onRecipientSelectChange($any($event.target).value)"
+              class="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-indigo-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+            >
+              <option value="">Destinatario</option>
+              @for (account of knownAccounts(); track account.name) {
+                <option [value]="account.name">
+                  {{ account.name }} ({{ account.balance }})
+                </option>
+              }
+              <option value="__new">Nuevo destinatario…</option>
+            </select>
+
+            @if (recipientMode() === 'new') {
+              <input
+                type="text"
+                placeholder="Nombre del nuevo destinatario"
+                [value]="newTransaction().to"
+                (input)="onTransactionFieldChange('to', $any($event.target).value)"
+                class="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-indigo-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+              />
+            }
+          </div>
+
+          <input
+            type="number"
+            min="0"
+            placeholder="Cantidad"
+            [value]="newTransaction().amount"
+            (input)="onTransactionFieldChange('amount', $any($event.target).value)"
+            class="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-indigo-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+          />
+
+          <button
+            type="button"
+            (click)="submitTransaction()"
+            [disabled]="isSubmitting()"
+            class="w-full rounded bg-indigo-600 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-500"
+          >
+            {{ isSubmitting() ? 'Registrando...' : 'Agregar transacción' }}
+          </button>
+        </div>
+
+        <div class="border-t border-gray-200 pt-4 dark:border-gray-700">
+          <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
+            Pool de transacciones ({{ pendingTransactions().length }})
+          </h3>
+          <div class="space-y-2 max-h-48 overflow-y-auto">
+            @if (!pendingTransactions().length) {
+              <div class="rounded bg-gray-100/60 p-2 text-xs text-gray-500 dark:bg-gray-800/60 dark:text-gray-400">
+                No hay transacciones pendientes.
+              </div>
+            } @else {
+              @for (tx of pendingTransactions(); track tx.id) {
+                <div class="rounded border-l-2 border-emerald-400 bg-gray-100/70 p-2 text-xs text-gray-700 dark:bg-gray-800/70 dark:text-gray-200">
+                  <div class="font-medium text-gray-900 dark:text-gray-100">{{ tx.from_account }} → {{ tx.to_account }}</div>
+                  <div class="flex justify-between text-[11px] text-gray-500 dark:text-gray-400">
+                    <span>{{ formatNumber(tx.amount) }} tokens</span>
+                    <span>{{ formatTimestamp(tx.created_at) }}</span>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <div class="rounded-2xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <h2 class="text-base font-bold text-gray-900 dark:text-white mb-3">Butlers activos</h2>
+        <div class="space-y-2">
+          @for (validator of validators(); track validator.slotIndex) {
+            <div class="rounded border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800" [ngClass]="validator.isCurrent ? 'border-emerald-400' : ''">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    {{ validator.name }}
+                  </div>
+                  <div class="text-xs text-gray-500 dark:text-gray-400">Slot {{ validator.slotIndex }}</div>
+                </div>
+                <div class="text-right text-xs text-emerald-500 dark:text-emerald-300">
+                  {{ validator.performance }} pts
+                </div>
+              </div>
+              <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">Stake: {{ validator.stake }}</div>
+              @if (validator.isCurrent) {
+                <div class="mt-1 text-xs text-amber-500">🎯 Próximo productor</div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <h2 class="text-base font-bold text-gray-900 dark:text-white mb-3">Candidatos</h2>
+        <div class="space-y-2">
+          @for (candidate of candidates(); track candidate.id) {
+            <div class="rounded bg-gray-50 p-2 text-sm text-gray-700 dark:bg-gray-800/60 dark:text-gray-200">
+              <div class="font-semibold text-gray-900 dark:text-gray-100">{{ candidate.name }}</div>
+              <div class="text-xs text-gray-500 dark:text-gray-400">Stake: {{ formatNumber(candidate.stake) }} • Score: {{ formatNumber(candidate.score) }}</div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+    <div class="rounded-2xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <h2 class="text-base font-bold text-gray-900 dark:text-white mb-3">Commissioners</h2>
+      <div class="space-y-2">
+        @for (comm of commissioners(); track comm.id) {
+          <div class="rounded bg-gray-50 p-3 dark:bg-gray-800/60">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ comm.name }}</div>
+                <div class="text-xs text-gray-500 dark:text-gray-400">{{ comm.region ?? 'Región desconocida' }}</div>
+              </div>
+              <div class="text-xs" [ngClass]="comm.online ? 'text-emerald-500' : 'text-gray-400'">
+                {{ comm.online ? 'En línea' : 'Fuera de línea' }}
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <h2 class="text-base font-bold text-gray-900 dark:text-white mb-3">Blockchain</h2>
+      <div class="space-y-2 max-h-96 overflow-y-auto">
+        @for (block of blockGroups(); track block.id) {
+          <div class="rounded border-l-4 border-emerald-400 bg-gray-50 p-3 dark:bg-gray-800/60">
+            <div class="flex items-center justify-between">
+              <div class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ block.id }}</div>
+              <div class="text-xs text-emerald-500 dark:text-emerald-300">{{ block.statusLabel }}</div>
+            </div>
+            <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Líder: {{ block.leader }} • TX: {{ block.txCount }} • Latencia: {{ block.latency }}
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-gray-200 bg-white/70 p-4 text-xs text-gray-600 dark:border-gray-700 dark:bg-gray-900/70 dark:text-gray-300">
+    <h3 class="text-sm font-bold text-gray-800 dark:text-gray-100 mb-2">Características implementadas</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-1">
+      <div>✅ Roles del consorcio (Commissioner, Butler, Candidate, User)</div>
+      <div>✅ Comité Nc con mayoría Nc/2 + 1</div>
+      <div>✅ Bloques paralelos con selección pseudoaleatoria de Butler</div>
+      <div>✅ Ventana de timeout Tcut y registro de consenso</div>
+      <div>✅ Fondos Alliance y recompensas variables</div>
+      <div>✅ Persistencia en Supabase para auditoría y demo</div>
+    </div>
+  </div>
 </section>
 

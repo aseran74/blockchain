@@ -1,0 +1,126 @@
+<section class="space-y-6">
+  <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div class="space-y-2">
+      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Histórico de transacciones</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Revisa operaciones registradas en Supabase, filtra por estado y monitoriza el flujo desde el pool hasta su
+        confirmación.
+      </p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <button
+        type="button"
+        (click)="refresh()"
+        class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-brand-500 hover:text-brand-600 dark:border-gray-700 dark:text-gray-200 dark:hover:border-brand-400"
+      >
+        <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+        Actualizar
+      </button>
+      <div class="rounded-lg border border-gray-200 px-4 py-2 text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400">
+        Total registros: {{ transactions().length }}
+      </div>
+    </div>
+  </header>
+
+  @if (loadError()) {
+    <div class="rounded-lg border border-rose-400 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+      {{ loadError() }}
+    </div>
+  }
+
+  <div class="grid gap-3 md:grid-cols-4">
+    @for (option of statusOptions; track option.key) {
+      <button
+        type="button"
+        (click)="setStatus(option.key)"
+        class="flex flex-col gap-1 rounded-lg border px-4 py-3 text-left transition"
+        [ngClass]="selectedStatus() === option.key
+          ? 'border-brand-500 bg-brand-500/5 text-brand-600 dark:border-brand-400 dark:bg-brand-500/10 dark:text-brand-300'
+          : 'border-gray-200 bg-white text-gray-700 hover:border-brand-200 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300'"
+      >
+        <span class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">{{ option.label }}</span>
+        <span class="text-lg font-semibold text-gray-900 dark:text-white">
+          {{ statusCount(option.key) }}
+        </span>
+      </button>
+    }
+  </div>
+
+  <div class="flex flex-col gap-3 rounded-2xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div class="text-sm text-gray-600 dark:text-gray-300">
+        Monto total filtrado:
+        <span class="font-semibold text-gray-900 dark:text-white">
+          {{ formatAmount(totalAmount()) }} PNV
+        </span>
+      </div>
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div class="relative w-full sm:w-72">
+          <input
+            type="search"
+            class="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+            placeholder="Buscar por ID / remitente / destinatario"
+            [value]="searchTerm()"
+            (input)="onSearchChange($any($event.target).value)"
+          />
+          @if (searchTerm()) {
+            <button
+              type="button"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              (click)="clearSearch()"
+            >
+              Limpiar
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-2 overflow-x-auto rounded-xl border border-gray-100 dark:border-gray-800">
+      <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-gray-700">
+        <thead class="bg-gray-50 text-left text-xs font-semibold uppercase text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+          <tr>
+            <th class="px-4 py-3">ID</th>
+            <th class="px-4 py-3">Fecha</th>
+            <th class="px-4 py-3">Remitente</th>
+            <th class="px-4 py-3">Destinatario</th>
+            <th class="px-4 py-3 text-right">Monto (PNV)</th>
+            <th class="px-4 py-3">Estado</th>
+            <th class="px-4 py-3">Bloque</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+          @if (filteredTransactions().length === 0) {
+            <tr>
+              <td colspan="7" class="px-4 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                No hay transacciones que coincidan con los filtros seleccionados.
+              </td>
+            </tr>
+          } @else {
+            @for (tx of filteredTransactions(); track tx.id) {
+              <tr class="hover:bg-gray-50/60 dark:hover:bg-gray-800/60">
+                <td class="px-4 py-3 font-medium text-gray-900 dark:text-white">{{ shortenId(tx.id) }}</td>
+                <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ formatTimestamp(tx.createdAt) }}</td>
+                <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ tx.from_account }}</td>
+                <td class="px-4 py-3 text-gray-600 dark:text-gray-300">{{ tx.to_account }}</td>
+                <td class="px-4 py-3 text-right font-semibold text-gray-900 dark:text-white">
+                  {{ formatAmount(tx.amountNumber) }}
+                </td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold" [ngClass]="statusBadgeClass(tx.status)">
+                    {{ statusLabel(tx.status) }}
+                  </span>
+                </td>
+                <td class="px-4 py-3 text-xs text-gray-500 dark:text-gray-400">
+                  {{ tx.block_group_id ? shortenId(tx.block_group_id) : '—' }}
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+

@@ -1,0 +1,160 @@
+<section class="space-y-6">
+  <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div class="space-y-2">
+      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Parámetros de consenso</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Configuración activa del protocolo PnV y versiones en borrador para iteraciones futuras.
+      </p>
+    </div>
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="rounded-lg border border-gray-200 px-4 py-2 text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400">
+        Total parámetros: {{ summary().total }}
+      </div>
+      <button
+        type="button"
+        class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-brand-500 hover:text-brand-600 dark:border-gray-700 dark:text-gray-200 dark:hover:border-brand-400"
+        (click)="refresh()"
+      >
+        <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+        Actualizar
+      </button>
+    </div>
+  </header>
+
+  @if (loadError()) {
+    <div class="rounded-lg border border-rose-400 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+      {{ loadError() }}
+    </div>
+  }
+
+  <div class="grid gap-3 md:grid-cols-4">
+    <article class="rounded-xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <h3 class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">Activos</h3>
+      <p class="mt-2 text-2xl font-semibold text-emerald-500 dark:text-emerald-300">{{ summary().active }}</p>
+    </article>
+    <article class="rounded-xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <h3 class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">En borrador</h3>
+      <p class="mt-2 text-2xl font-semibold text-amber-500 dark:text-amber-300">{{ summary().draft }}</p>
+    </article>
+    <article class="rounded-xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <h3 class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">Pendientes</h3>
+      <p class="mt-2 text-2xl font-semibold text-blue-500 dark:text-blue-300">{{ summary().pending }}</p>
+    </article>
+    <article class="rounded-xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <h3 class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">Mayoría Nc/2+1</h3>
+      <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">
+        {{ majorityThreshold() }} votos
+      </p>
+    </article>
+  </div>
+
+  <div class="rounded-2xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div class="flex flex-wrap gap-2">
+        <button
+          type="button"
+          class="rounded-lg border px-4 py-2 text-sm font-medium transition"
+          [ngClass]="selectedStatus() === 'all'
+            ? 'border-brand-500 bg-brand-500/10 text-brand-600 dark:border-brand-400 dark:bg-brand-500/20 dark:text-brand-300'
+            : 'border-gray-200 text-gray-600 hover:border-brand-200 dark:border-gray-700 dark:text-gray-300'"
+          (click)="setStatus('all')"
+        >
+          Todos
+        </button>
+        <button
+          type="button"
+          class="rounded-lg border px-4 py-2 text-sm font-medium transition"
+          [ngClass]="selectedStatus() === 'active'
+            ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:border-emerald-400 dark:bg-emerald-500/20 dark:text-emerald-300'
+            : 'border-gray-200 text-gray-600 hover:border-brand-200 dark:border-gray-700 dark:text-gray-300'"
+          (click)="setStatus('active')"
+        >
+          Activos
+        </button>
+        <button
+          type="button"
+          class="rounded-lg border px-4 py-2 text-sm font-medium transition"
+          [ngClass]="selectedStatus() === 'draft'
+            ? 'border-amber-500 bg-amber-500/10 text-amber-600 dark:border-amber-400 dark:bg-amber-500/20 dark:text-amber-300'
+            : 'border-gray-200 text-gray-600 hover:border-brand-200 dark:border-gray-700 dark:text-gray-300'"
+          (click)="setStatus('draft')"
+        >
+          Borradores
+        </button>
+        <button
+          type="button"
+          class="rounded-lg border px-4 py-2 text-sm font-medium transition"
+          [ngClass]="selectedStatus() === 'pending'
+            ? 'border-blue-500 bg-blue-500/10 text-blue-600 dark:border-blue-400 dark:bg-blue-500/20 dark:text-blue-300'
+            : 'border-gray-200 text-gray-600 hover:border-brand-200 dark:border-gray-700 dark:text-gray-300'"
+          (click)="setStatus('pending')"
+        >
+          Pendientes
+        </button>
+        <button
+          type="button"
+          class="rounded-lg border px-4 py-2 text-sm font-medium transition"
+          [ngClass]="selectedStatus() === 'retired'
+            ? 'border-gray-500 bg-gray-500/10 text-gray-600 dark:border-gray-400 dark:bg-gray-500/20 dark:text-gray-300'
+            : 'border-gray-200 text-gray-600 hover:border-brand-200 dark:border-gray-700 dark:text-gray-300'"
+          (click)="setStatus('retired')"
+        >
+          Retirados
+        </button>
+      </div>
+      <div class="relative w-full md:w-72">
+        <input
+          type="search"
+          class="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+          placeholder="Buscar por clave"
+          [value]="searchTerm()"
+          (input)="onSearchChange($any($event.target).value)"
+        />
+        @if (searchTerm()) {
+          <button
+            type="button"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            (click)="clearSearch()"
+          >
+            Limpiar
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="space-y-3">
+    @if (filteredParameters().length === 0) {
+      <div class="rounded-xl border border-dashed border-gray-200 bg-white/60 p-10 text-center text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-400">
+        No hay parámetros que coincidan con los filtros seleccionados.
+      </div>
+    } @else {
+      @for (parameter of filteredParameters(); track parameter.id) {
+        <article class="rounded-xl border border-gray-100 bg-white/80 p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+          <header class="flex flex-col gap-3 border-b border-gray-100 pb-4 dark:border-gray-800 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ parameter.key }}</h2>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                Versión {{ parameter.version }} • Actualizado {{ formatTimestamp(parameter.updatedAt) }}
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+              <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold" [ngClass]="statusBadgeClass(parameter.status)">
+                {{ parameter.statusLabel }}
+              </span>
+              <span class="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                Activado {{ formatTimestamp(parameter.activatedAt) }}
+              </span>
+            </div>
+          </header>
+
+          <div class="mt-4 rounded-lg border border-gray-100 bg-gray-50 p-4 text-sm text-gray-700 dark:border-gray-800 dark:bg-gray-800/60 dark:text-gray-200">
+            <h3 class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">Valor</h3>
+            <pre class="mt-2 whitespace-pre-wrap break-words text-sm text-gray-900 dark:text-white">{{ parameter.value | json }}</pre>
+          </div>
+        </article>
+      }
+    }
+  </div>
+</section>
+

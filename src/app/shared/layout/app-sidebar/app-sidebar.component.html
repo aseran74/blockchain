@@ -25,21 +25,20 @@
     <a routerLink="/">
       @if ((isExpanded$ | async) || (isHovered$ | async) || (isMobileOpen$ | async)) {
       <img
-        class="dark:hidden"
-        src="/images/logo/logo.svg"
-        alt="Logo"
+        src="/images/logo/Votalia.png"
+        alt="Votalia"
         width="150"
-        height="40"
-      />
-      <img
-        class="hidden dark:block"
-        src="/images/logo/logo-dark.svg"
-        alt="Logo"
-        width="150"
-        height="40"
+        height="46"
+        class="object-contain"
       />
       } @else {
-      <img src="/images/logo/logo-icon.svg" alt="Logo" width="32" height="32" />
+      <img
+        src="/images/logo/Votalia.png"
+        alt="Votalia"
+        width="40"
+        height="40"
+        class="object-contain"
+      />
       }
     </a>
   </div>
@@ -450,8 +449,5 @@
         <!-- end other section -->
       </div>
     </nav>
-    @if ((isExpanded$ | async) || (isHovered$ | async) || (isMobileOpen$ | async)) {
-    <app-sidebar-widget />
-    }
   </div>
 </aside>

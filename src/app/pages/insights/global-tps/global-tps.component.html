@@ -1,0 +1,417 @@
+<section class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6">
+  <div class="mx-auto max-w-7xl space-y-6">
+    <header class="text-center space-y-3">
+      <div class="flex items-center justify-center gap-3">
+        <svg class="h-10 w-10 text-blue-400" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2Z" />
+          <path d="M2 12h20" />
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z" />
+        </svg>
+        <h1 class="text-3xl font-bold text-white">Calculadora TPS Mundial</h1>
+      </div>
+      <p class="text-sm text-blue-200">¿Cuántas transacciones por segundo necesita el mundo sin efectivo?</p>
+      <p class="text-xs text-blue-200/70">Simulación educativa basada en datos de adopción digital y capacidad real de redes de pago</p>
+    </header>
+
+    <section class="grid grid-cols-2 gap-3 md:grid-cols-4">
+      @for (scenarioEntry of scenarioEntries; track scenarioEntry[0]) {
+        <button
+          type="button"
+          (click)="loadScenario(scenarioEntry[0])"
+          class="rounded-lg border-2 p-4 transition"
+          [ngClass]="scenario() === scenarioEntry[0]
+            ? 'bg-blue-600 border-blue-400 text-white shadow-lg shadow-blue-500/20'
+            : 'bg-slate-800/50 border-slate-600 text-slate-200 hover:border-blue-400 hover:text-white'"
+        >
+          <div class="text-lg font-semibold">{{ scenarioEntry[1].name }}</div>
+          <div class="text-xs text-white/70">
+            {{ scenarioEntry[1].txPerDay }} TX/día • {{ scenarioEntry[1].active }}% activos
+          </div>
+        </button>
+      }
+    </section>
+
+    <section class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div class="space-y-4">
+        <article class="rounded-xl border border-blue-500/30 bg-slate-800/60 backdrop-blur p-5 shadow-lg shadow-blue-500/10">
+          <header class="mb-4 flex items-center gap-2 text-white">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M9 3v6l-2-1" />
+              <path d="M15 3v6l2-1" />
+              <path d="M12 13a5 5 0 1 0 5 5" />
+            </svg>
+            <h2 class="text-lg font-bold">Parámetros globales</h2>
+          </header>
+
+          <div class="space-y-5 text-sm text-slate-200">
+            <div>
+              <label class="mb-2 block text-xs uppercase tracking-wide text-slate-300">Población mundial (millones)</label>
+              <input
+                type="range"
+                min="1000"
+                max="10000"
+                step="100"
+                [value]="worldPopulation()"
+                (input)="onPopulationChange($any($event.target).value)"
+                class="w-full"
+              />
+              <div class="mt-2 text-right text-xl font-semibold text-white">
+                {{ formatNumber(worldPopulation()) }}M personas
+              </div>
+            </div>
+
+            <div>
+              <label class="mb-2 block text-xs uppercase tracking-wide text-slate-300">Población activa en pagos digitales (%)</label>
+              <input
+                type="range"
+                min="10"
+                max="100"
+                step="5"
+                [value]="activePercent()"
+                (input)="onActivePercentChange($any($event.target).value)"
+                class="w-full"
+              />
+              <div class="mt-2 text-right text-xl font-semibold text-white">
+                {{ activePercent() }}% = {{ formatNumber(activeUsers()) }}M personas
+              </div>
+            </div>
+
+            <div>
+              <label class="mb-2 block text-xs uppercase tracking-wide text-slate-300">Transacciones por persona al día</label>
+              <input
+                type="range"
+                min="1"
+                max="30"
+                step="1"
+                [value]="txPerDay()"
+                (input)="onTxPerDayChange($any($event.target).value)"
+                class="w-full"
+              />
+              <div class="mt-2 text-right text-xl font-semibold text-white">
+                {{ txPerDay() }} transacciones
+              </div>
+            </div>
+
+            <div>
+              <label class="mb-2 block text-xs uppercase tracking-wide text-slate-300">Multiplicador de pico (hora punta)</label>
+              <input
+                type="range"
+                min="2"
+                max="20"
+                step="1"
+                [value]="peakMultiplier()"
+                (input)="onPeakMultiplierChange($any($event.target).value)"
+                class="w-full"
+              />
+              <div class="mt-2 text-right text-xl font-semibold text-white">
+                {{ peakMultiplier() }}x
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="rounded-xl border border-green-500/30 bg-slate-800/60 backdrop-blur p-5 shadow-lg shadow-green-500/10">
+          <header class="mb-4 flex items-center gap-2 text-white">
+            <svg class="h-5 w-5 text-green-400" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M3 3v18h18" />
+              <path d="M18 17V9" />
+              <path d="M13 17V5" />
+              <path d="M8 17v-3" />
+            </svg>
+            <h2 class="text-lg font-bold">Necesidades calculadas</h2>
+          </header>
+
+          <div class="space-y-3">
+            <div class="rounded-lg bg-slate-700/50 p-3">
+              <div class="text-xs uppercase tracking-wide text-slate-300">Transacciones diarias</div>
+              <div class="text-2xl font-bold text-white">{{ formatBillions(results().dailyTxBillions) }}B</div>
+            </div>
+
+            <div class="rounded-lg bg-slate-700/50 p-3">
+              <div class="text-xs uppercase tracking-wide text-slate-300">TPS promedio requerido</div>
+              <div class="text-3xl font-bold text-blue-300">{{ formatNumber(results().avgTPS) }}</div>
+            </div>
+
+            <div class="rounded-lg border-2 border-yellow-500/40 bg-slate-700/50 p-3">
+              <div class="text-xs font-semibold uppercase tracking-wide text-yellow-400">🔥 TPS pico (hora punta)</div>
+              <div class="text-4xl font-bold text-yellow-200">{{ formatNumber(results().peakTPS) }}</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="rounded-xl border border-purple-500/30 bg-slate-800/60 backdrop-blur p-5 shadow-lg shadow-purple-500/10">
+          <header class="mb-4 flex items-center gap-2 text-white">
+            <svg class="h-5 w-5 text-purple-300" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M4 6h16" />
+              <path d="M4 10h16" />
+              <path d="M4 14h16" />
+              <path d="M4 18h16" />
+            </svg>
+            <h2 class="text-lg font-bold">Sistemas necesarios (pico)</h2>
+          </header>
+
+          <div class="space-y-2">
+            <div class="rounded border border-blue-500/30 bg-blue-900/20 p-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-sm font-semibold text-blue-200">Redes Visa</div>
+                  <div class="text-xs text-blue-100/70">@ 1,700 TPS reales</div>
+                </div>
+                <div class="text-2xl font-bold text-blue-200">{{ formatNumber(results().visaNeeded) }}</div>
+              </div>
+            </div>
+
+            <div class="rounded border border-green-500/30 bg-green-900/20 p-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-sm font-semibold text-green-200">Consorcios PPoV</div>
+                  <div class="text-xs text-green-100/70">@ 13,990 TPS reales</div>
+                </div>
+                <div class="text-2xl font-bold text-green-200">{{ formatNumber(results().ppovNeeded) }}</div>
+              </div>
+            </div>
+
+            <div class="rounded border border-purple-500/30 bg-purple-900/20 p-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-sm font-semibold text-purple-200">Blockchains Solana</div>
+                  <div class="text-xs text-purple-100/70">@ 1,504 TPS reales</div>
+                </div>
+                <div class="text-2xl font-bold text-purple-200">{{ formatNumber(results().solanaNeeded) }}</div>
+              </div>
+            </div>
+
+            <div class="rounded border border-rose-500/30 bg-rose-900/20 p-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="text-sm font-semibold text-rose-200">Blockchains Polygon PoS</div>
+                  <div class="text-xs text-rose-100/70">@ 48 TPS reales</div>
+                </div>
+                <div class="text-2xl font-bold text-rose-200">{{ formatNumber(results().polygonNeeded) }}</div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="space-y-4">
+        <article class="rounded-xl border border-blue-500/30 bg-slate-800/60 backdrop-blur p-5 shadow-lg shadow-blue-500/10">
+          <header class="mb-4 flex items-center gap-2 text-white">
+            <svg class="h-5 w-5 text-yellow-400" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M3 12h18" />
+              <path d="M12 3v18" />
+            </svg>
+            <h2 class="text-lg font-bold">Capacidad vs necesidad</h2>
+          </header>
+
+          <div class="space-y-3">
+            @for (tech of technologyList; track tech.key) {
+              <div class="rounded bg-slate-700/50 p-3">
+                <div class="mb-2 flex items-start justify-between">
+                  <div>
+                    <div class="text-sm font-semibold text-white">{{ tech.name }}</div>
+                    <div class="text-xs text-slate-400">Real: {{ formatNumber(tech.real) }} TPS</div>
+                  </div>
+                  <div>
+                    @switch (technologyStatus(tech.real)) {
+                      @case ('peak') {
+                        <svg class="h-5 w-5 text-green-400" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+                          <path d="m5 12 5 5L20 7" />
+                        </svg>
+                      }
+                      @case ('avg') {
+                        <svg class="h-5 w-5 text-yellow-400" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+                          <path d="M12 22v-8" />
+                          <path d="M5.22 19 6.4 17.5" />
+                          <path d="M1 13h2" />
+                          <path d="M22 13h-2" />
+                          <path d="M17.6 17.5 18.78 19" />
+                          <path d="M7.5 8h9l-1.5 6h-6z" />
+                        </svg>
+                      }
+                      @default {
+                        <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+                          <path d="m18 6-12 12" />
+                          <path d="m6 6 12 12" />
+                        </svg>
+                      }
+                    }
+                  </div>
+                </div>
+
+                <div class="h-2 w-full rounded-full bg-slate-900">
+                  <div
+                    class="h-2 rounded-full transition-all duration-500"
+                    [style.width.%]="technologyCoverage(tech.real)"
+                    [ngClass]="technologyStatus(tech.real) === 'peak'
+                      ? 'bg-emerald-500'
+                      : technologyStatus(tech.real) === 'avg'
+                        ? 'bg-yellow-500'
+                        : 'bg-red-500'"
+                  ></div>
+                </div>
+                <div class="mt-1 text-right text-xs text-slate-400">
+                  {{ technologyCoverage(tech.real) | number:'1.0-1' }}% de lo necesario
+                </div>
+              </div>
+            }
+          </div>
+        </article>
+
+        <article class="rounded-xl border border-orange-500/30 bg-slate-800/60 backdrop-blur p-5 shadow-lg shadow-orange-500/10">
+          <header class="mb-4 flex items-center gap-2 text-white">
+            <svg class="h-5 w-5 text-orange-300" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M20.12 12.12 13.5 4.5 11 11l-7.12 2.88a1 1 0 0 0-.38 1.64l5 5a1 1 0 0 0 1.64-.38L11 13l6.62-7.62" />
+            </svg>
+            <h2 class="text-lg font-bold">Marketing vs realidad</h2>
+          </header>
+
+          <div class="space-y-3 text-xs text-slate-300">
+            <div class="rounded border border-orange-500/30 bg-orange-900/20 p-3">
+              <div class="font-semibold text-orange-300">Polygon zkEVM</div>
+              <div>Teórico: <strong class="text-white">200,000 TPS</strong></div>
+              <div>Real actual: <strong class="text-red-300">0.06 TPS 💀</strong></div>
+              <div class="text-slate-400">Uso: 0.00003% de capacidad</div>
+            </div>
+
+            <div class="rounded border border-violet-500/30 bg-violet-900/20 p-3">
+              <div class="font-semibold text-violet-200">Polygon PoS</div>
+              <div>Teórico: <strong class="text-white">65,000 TPS</strong></div>
+              <div>Real actual: <strong class="text-yellow-300">48 TPS</strong></div>
+              <div class="text-slate-400">Uso: 0.07% de capacidad</div>
+            </div>
+
+            <div class="rounded border border-purple-500/30 bg-purple-900/20 p-3">
+              <div class="font-semibold text-purple-200">Solana</div>
+              <div>Teórico: <strong class="text-white">65,000 TPS</strong></div>
+              <div>Real actual: <strong class="text-green-300">1,504 TPS</strong></div>
+              <div class="text-slate-400">Uso: 2.3% de capacidad</div>
+            </div>
+
+            <div class="rounded border border-emerald-500/30 bg-emerald-900/20 p-3">
+              <div class="flex items-center gap-2 font-semibold text-emerald-200">PPoV
+                <svg class="h-4 w-4 text-yellow-300" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="m12 17 5 3-1.9-5.7L19 10h-5.9L12 4.5 10.9 10H5l3.9 4.3L7 20z" />
+                </svg>
+              </div>
+              <div>Teórico: <strong class="text-white">15,000 TPS</strong></div>
+              <div>Demostrado: <strong class="text-emerald-300">13,990 TPS ✅</strong></div>
+              <div class="text-slate-400">Uso: 93% de capacidad validado</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="rounded-xl border border-green-500/30 bg-slate-800/60 backdrop-blur p-5 shadow-lg shadow-green-500/10">
+          <header class="mb-3 flex items-center gap-2 text-white">
+            <svg class="h-5 w-5 text-green-300" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+              <path d="m20 6-11 9-5-4" />
+              <path d="M20 6v12H4" />
+            </svg>
+            <h2 class="text-lg font-bold">Soluciones viables hoy</h2>
+          </header>
+
+          <div class="space-y-3 text-sm text-slate-200">
+            <div class="rounded border-l-4 border-green-500 bg-green-900/20 p-3">
+              <div class="font-semibold text-green-300">✅ Federación PPoV</div>
+              <div class="text-xs text-slate-300">{{ formatNumber(results().ppovNeeded) }} consorcios regionales independientes</div>
+              <div class="text-xs text-slate-400">Ventajas: finalidad inmediata, bajo costo, alta confiabilidad</div>
+            </div>
+
+            <div
+              class="rounded border-l-4 p-3"
+              [ngClass]="results().visaNeeded <= 20
+                ? 'border-green-500 bg-green-900/20'
+                : 'border-yellow-500 bg-yellow-900/20'"
+            >
+              <div
+                class="font-semibold"
+                [ngClass]="results().visaNeeded <= 20 ? 'text-green-300' : 'text-yellow-300'"
+              >
+                {{ results().visaNeeded <= 20 ? '✅' : '⚠️' }} Infraestructura Visa expandida
+              </div>
+              <div class="text-xs text-slate-300">{{ formatNumber(results().visaNeeded) }} redes regionales coordinadas</div>
+              <div class="text-xs text-slate-400">
+                {{ results().visaNeeded <= 20 ? 'Factible con infraestructura actual' : 'Requiere expansión significativa' }}
+              </div>
+            </div>
+
+            <div class="rounded border-l-4 border-red-500 bg-red-900/20 p-3">
+              <div class="font-semibold text-red-300">❌ Ethereum L2s actuales</div>
+              <div class="text-xs text-slate-300">Insuficiente capacidad real (500 TPS combinados)</div>
+              <div class="text-xs text-slate-400">Necesitan mejorar {{ formatNumber(l2Gap()) }}x para ser viables</div>
+            </div>
+
+            <div class="rounded border-l-4 border-yellow-500 bg-yellow-900/20 p-3">
+              <div class="font-semibold text-yellow-300">⚠️ Solana multi-chain</div>
+              <div class="text-xs text-slate-300">{{ formatNumber(results().solanaNeeded) }} blockchains independientes</div>
+              <div class="text-xs text-slate-400">Compleja coordinación, pero técnicamente posible</div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <article class="rounded-lg border border-green-500/30 bg-gradient-to-br from-green-900/40 to-green-800/30 p-4 text-sm text-slate-200">
+        <header class="mb-2 flex items-center gap-2 text-white">
+          <svg class="h-5 w-5 text-green-400" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M9 11l3 3L22 4" />
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+          </svg>
+          <h3 class="font-semibold">PPoV: Campeón enterprise</h3>
+        </header>
+        <ul class="space-y-1 text-xs text-slate-200/90">
+          <li>• Solo necesitas {{ formatNumber(results().ppovNeeded) }} consorcios</li>
+          <li>• 13,990 TPS demostrados con 16 nodos</li>
+          <li>• Finalidad inmediata y auditoría sencilla</li>
+          <li>• Ideal para bancos y gobiernos</li>
+        </ul>
+      </article>
+
+      <article class="rounded-lg border border-blue-500/30 bg-gradient-to-br from-blue-900/40 to-blue-800/30 p-4 text-sm text-slate-200">
+        <header class="mb-2 flex items-center gap-2 text-white">
+          <svg class="h-5 w-5 text-blue-400" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M3 3h18v4H3z" />
+            <path d="M3 11h18v4H3z" />
+            <path d="M3 19h18v2H3z" />
+          </svg>
+          <h3 class="font-semibold">Visa: Infraestructura probada</h3>
+        </header>
+        <ul class="space-y-1 text-xs text-slate-200/90">
+          <li>• Operativa global hoy</li>
+          <li>• Requiere {{ formatNumber(results().visaNeeded) }} redes coordinadas</li>
+          <li>• Centralizado pero confiable</li>
+          <li>• Coste 2-3% por transacción</li>
+        </ul>
+      </article>
+
+      <article class="rounded-lg border border-red-500/30 bg-gradient-to-br from-red-900/40 to-red-800/30 p-4 text-sm text-slate-200">
+        <header class="mb-2 flex items-center gap-2 text-white">
+          <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+            <path d="m18 6-12 12" />
+            <path d="m6 6 12 12" />
+          </svg>
+          <h3 class="font-semibold">L2s: Promesas futuras</h3>
+        </header>
+        <ul class="space-y-1 text-xs text-slate-200/90">
+          <li>• Gran capacidad teórica</li>
+          <li>• Uso real conjunto ≈ 500 TPS</li>
+          <li>• Brecha: {{ formatNumber(l2Gap()) }}x por alcanzar</li>
+          <li>• Aún no listas para adopción masiva</li>
+        </ul>
+      </article>
+    </section>
+
+    <footer class="rounded-lg border border-slate-600 bg-slate-900/40 p-4 text-xs text-slate-300">
+      <h4 class="text-sm font-semibold text-slate-200">📊 Metodología de cálculo</h4>
+      <ul class="mt-2 space-y-1">
+        <li>• TPS promedio = (Población × % activos × TX/día) ÷ 86,400 segundos</li>
+        <li>• TPS pico = TPS promedio × multiplicador (Black Friday, pagos masivos, etc.)</li>
+        <li>• Sistemas necesarios = TPS pico ÷ TPS real de cada tecnología</li>
+      </ul>
+      <p class="mt-3 border-t border-slate-700 pt-3 text-slate-400">
+        Fuentes: papers académicos validados (PPoV 13,990 TPS @16 nodos), datos de uso real de L2Beat, CoinMetrics y documentación oficial de cada red.
+      </p>
+    </footer>
+  </div>
+</section>

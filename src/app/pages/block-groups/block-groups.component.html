@@ -1,0 +1,183 @@
+<section class="space-y-6">
+  <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div class="space-y-2">
+      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Grupos de bloques</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Seguimiento del consenso PnV: latencias, votos y saldos auditables en Supabase.
+      </p>
+    </div>
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="rounded-lg border border-gray-200 px-4 py-2 text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400">
+        Última actualización {{ formatTimestamp(dashboardState()?.stats?.updated_at ?? null) }}
+      </div>
+      <button
+        type="button"
+        class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-brand-500 hover:text-brand-600 dark:border-gray-700 dark:text-gray-200 dark:hover:border-brand-400"
+        (click)="refresh()"
+      >
+        <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+        Actualizar
+      </button>
+    </div>
+  </header>
+
+  @if (loadError()) {
+    <div class="rounded-lg border border-rose-400 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+      {{ loadError() }}
+    </div>
+  }
+
+  <div class="grid gap-3 md:grid-cols-4">
+    <article class="rounded-xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <h3 class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">Bloques totales</h3>
+      <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">{{ summary().total }}</p>
+    </article>
+    <article class="rounded-xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <h3 class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">Confirmados</h3>
+      <p class="mt-2 text-2xl font-semibold text-emerald-500 dark:text-emerald-300">{{ summary().confirmed }}</p>
+    </article>
+    <article class="rounded-xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <h3 class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">Bloques activos</h3>
+      <p class="mt-2 text-2xl font-semibold text-blue-500 dark:text-blue-300">{{ summary().active }}</p>
+    </article>
+    <article class="rounded-xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <h3 class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">Latencia promedio</h3>
+      <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">{{ summary().averageConsensus }}</p>
+    </article>
+  </div>
+
+  <div class="rounded-2xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div class="flex flex-wrap gap-2">
+        <button
+          type="button"
+          class="rounded-lg border px-4 py-2 text-sm font-medium transition"
+          [ngClass]="selectedStatus() === 'all'
+            ? 'border-brand-500 bg-brand-500/10 text-brand-600 dark:border-brand-400 dark:bg-brand-500/20 dark:text-brand-300'
+            : 'border-gray-200 text-gray-600 hover:border-brand-200 dark:border-gray-700 dark:text-gray-300'"
+          (click)="setStatus('all')"
+        >
+          Todos
+        </button>
+        <button
+          type="button"
+          class="rounded-lg border px-4 py-2 text-sm font-medium transition"
+          [ngClass]="selectedStatus() === 'confirmed'
+            ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:border-emerald-400 dark:bg-emerald-500/20 dark:text-emerald-300'
+            : 'border-gray-200 text-gray-600 hover:border-brand-200 dark:border-gray-700 dark:text-gray-300'"
+          (click)="setStatus('confirmed')"
+        >
+          Confirmados
+        </button>
+        <button
+          type="button"
+          class="rounded-lg border px-4 py-2 text-sm font-medium transition"
+          [ngClass]="selectedStatus() === 'voting'
+            ? 'border-blue-500 bg-blue-500/10 text-blue-600 dark:border-blue-400 dark:bg-blue-500/20 dark:text-blue-300'
+            : 'border-gray-200 text-gray-600 hover:border-brand-200 dark:border-gray-700 dark:text-gray-300'"
+          (click)="setStatus('voting')"
+        >
+          En votación
+        </button>
+        <button
+          type="button"
+          class="rounded-lg border px-4 py-2 text-sm font-medium transition"
+          [ngClass]="selectedStatus() === 'pending'
+            ? 'border-amber-500 bg-amber-500/10 text-amber-600 dark:border-amber-400 dark:bg-amber-500/20 dark:text-amber-300'
+            : 'border-gray-200 text-gray-600 hover:border-brand-200 dark:border-gray-700 dark:text-gray-300'"
+          (click)="setStatus('pending')"
+        >
+          Pendientes
+        </button>
+        <button
+          type="button"
+          class="rounded-lg border px-4 py-2 text-sm font-medium transition"
+          [ngClass]="selectedStatus() === 'timeout'
+            ? 'border-rose-500 bg-rose-500/10 text-rose-600 dark:border-rose-400 dark:bg-rose-500/20 dark:text-rose-300'
+            : 'border-gray-200 text-gray-600 hover:border-brand-200 dark:border-gray-700 dark:text-gray-300'"
+          (click)="setStatus('timeout')"
+        >
+          Timeout
+        </button>
+      </div>
+      <div class="relative w-full md:w-72">
+        <input
+          type="search"
+          class="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+          placeholder="Buscar por altura, ID o líder"
+          [value]="searchTerm()"
+          (input)="onSearchChange($any($event.target).value)"
+        />
+        @if (searchTerm()) {
+          <button
+            type="button"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            (click)="clearSearch()"
+          >
+            Limpiar
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="space-y-4">
+    @if (filteredBlockGroups().length === 0) {
+      <div class="rounded-xl border border-dashed border-gray-200 bg-white/60 p-10 text-center text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-400">
+        No hay grupos de bloques para los filtros seleccionados.
+      </div>
+    } @else {
+      @for (group of filteredBlockGroups(); track group.id) {
+        <article class="rounded-xl border border-gray-100 bg-white/80 p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+          <header class="flex flex-col gap-3 border-b border-gray-100 pb-4 dark:border-gray-800 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Bloque #{{ group.height }}</h2>
+              <p class="text-xs text-gray-500 dark:text-gray-400">ID {{ group.id }}</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 text-sm">
+              <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold" [ngClass]="statusBadgeClass(group.status)">
+                {{ group.statusLabel }}
+              </span>
+              <span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                Líder: {{ group.leaderName }}
+              </span>
+              <span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                Tx: {{ group.txCount }}
+              </span>
+              <span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                Votos: {{ group.approvals }} / {{ group.approvals + group.rejections }}
+              </span>
+            </div>
+          </header>
+
+          <div class="grid gap-4 py-4 md:grid-cols-3">
+            <div>
+              <h3 class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">Creado</h3>
+              <p class="mt-1 text-sm text-gray-700 dark:text-gray-200">{{ formatTimestamp(group.createdAt) }}</p>
+            </div>
+            <div>
+              <h3 class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">Confirmado</h3>
+              <p class="mt-1 text-sm text-gray-700 dark:text-gray-200">{{ formatTimestamp(group.confirmedAt) }}</p>
+            </div>
+            <div>
+              <h3 class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">Latencia</h3>
+              <p class="mt-1 text-sm text-gray-700 dark:text-gray-200">{{ consensusDurationLabel(group) }}</p>
+            </div>
+          </div>
+
+          <footer class="flex flex-wrap items-center gap-3 border-t border-gray-100 pt-4 text-xs text-gray-500 dark:border-gray-800 dark:text-gray-400">
+            <span>Inicio consenso: {{ formatTimestamp(group.consensusStartAt) }}</span>
+            <span>Timeout previsto: {{ formatTimestamp(group.tcutAt) }}</span>
+            <span>
+              Aprobaciones:
+              <span class="font-semibold text-emerald-500 dark:text-emerald-300">{{ group.approvals }}</span>
+              /
+              <span class="font-semibold text-rose-400 dark:text-rose-300">{{ group.rejections }}</span>
+            </span>
+          </footer>
+        </article>
+      }
+    }
+  </div>
+</section>
+

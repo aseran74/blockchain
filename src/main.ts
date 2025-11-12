@@ -28,5 +28,55 @@ import { register as registerSwiperElements } from 'swiper/element/bundle';
 
 registerSwiperElements();
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+const assignEnvToGlobals = (source: Record<string, string | undefined> = {}) => {
+  const globalRef =
+    (globalThis as unknown as Record<string, string | undefined>) ?? {};
+  const windowRef =
+    (globalThis as unknown as { __env?: Record<string, string | undefined> });
+
+  windowRef.__env = {
+    ...(windowRef.__env ?? {}),
+    ...source,
+  };
+
+  for (const [key, value] of Object.entries(source)) {
+    if (typeof value === 'string' && value.length > 0) {
+      globalRef[key] = value;
+    }
+  }
+};
+
+const loadRuntimeEnv = async () => {
+  try {
+    const response = await fetch('/env-config.json', { cache: 'no-cache' });
+    if (!response.ok) {
+      return;
+    }
+    const runtimeEnv = (await response.json()) as Record<string, string | undefined>;
+    assignEnvToGlobals(runtimeEnv);
+  } catch (error) {
+    console.warn('No se pudo cargar env-config.json:', error);
+  }
+};
+
+const metaEnv =
+  ((import.meta as unknown as { env?: Record<string, string | undefined> })?.env) ??
+  {};
+
+if (metaEnv) {
+assignEnvToGlobals({
+  NG_APP_SUPABASE_URL:
+    metaEnv['NG_APP_SUPABASE_URL'] ??
+    metaEnv['SUPABASE_URL'],
+  NG_APP_SUPABASE_ANON_KEY:
+    metaEnv['NG_APP_SUPABASE_ANON_KEY'] ??
+    metaEnv['SUPABASE_ANON_KEY'],
+});
+}
+
+const bootstrap = async () => {
+  await loadRuntimeEnv();
+  bootstrapApplication(AppComponent, appConfig).catch((err) => console.error(err));
+};
+
+bootstrap();

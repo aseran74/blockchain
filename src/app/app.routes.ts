@@ -9,44 +9,67 @@ import { TransactionsComponent } from './pages/transactions/transactions.compone
 import { NodesComponent } from './pages/nodes/nodes.component';
 import { GovernanceComponent } from './pages/governance/governance.component';
 import { ParametersComponent } from './pages/parameters/parameters.component';
+import { GlobalTpsComponent } from './pages/insights/global-tps/global-tps.component';
+import { WalletsComponent } from './pages/wallets/wallets.component';
+import { HomeComponent } from './pages/home/home.component';
 
 export const routes: Routes = [
   {
-    path:'',
-    component:AppLayoutComponent,
-    children:[
+    path: '',
+    component: HomeComponent,
+    pathMatch: 'full',
+    title: 'Votalia | Plataforma PnV',
+  },
+  {
+    path: '',
+    component: AppLayoutComponent,
+    children: [
       {
-        path: '',
+        path: 'dashboard',
         component: OverviewComponent,
-        pathMatch: 'full',
         title: 'Votalia | Panel operativo PnV',
       },
       {
-        path:'block-groups',
-        component:BlockGroupsComponent,
-        title:'Grupos de bloques | Votalia',
+        path: 'block-groups',
+        component: BlockGroupsComponent,
+        title: 'Grupos de bloques | Votalia',
       },
       {
-        path:'transactions',
-        component:TransactionsComponent,
-        title:'Transacciones | Votalia',
+        path: 'transactions',
+        component: TransactionsComponent,
+        title: 'Transacciones | Votalia',
       },
       {
-        path:'nodes',
-        component:NodesComponent,
-        title:'Nodos y roles | Votalia',
+        path: 'nodes',
+        component: NodesComponent,
+        title: 'Nodos y roles | Votalia',
       },
       {
-        path:'governance',
-        component:GovernanceComponent,
-        title:'Gobernanza | Votalia',
+        path: 'governance',
+        component: GovernanceComponent,
+        title: 'Gobernanza | Votalia',
       },
       {
-        path:'parameters',
-        component:ParametersComponent,
-        title:'Parámetros de consenso | Votalia',
+        path: 'parameters',
+        component: ParametersComponent,
+        title: 'Parámetros de consenso | Votalia',
       },
-    ]
+      {
+        path: 'wallets',
+        component: WalletsComponent,
+        title: 'Wallet Votalia | Demo',
+      },
+      {
+        path: 'global-tps',
+        component: GlobalTpsComponent,
+        title: 'Proyección TPS mundial | Votalia',
+      },
+      {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'dashboard',
+      },
+    ],
   },
   // auth pages
   {

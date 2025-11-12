@@ -639,40 +639,31 @@ export interface Database {
       };
       pnv_transactions: {
         Row: {
-          assigned_height: number | null;
-          assigned_slot: number | null;
           block_id: string | null;
           created_at: string;
           fee: string;
           hash: string;
           id: string;
-          packed_at: string | null;
           payload: Json | null;
           sender_id: string | null;
           status: Database['public']['Enums']['pnv_transaction_status'];
         };
         Insert: {
-          assigned_height?: number | null;
-          assigned_slot?: number | null;
           block_id?: string | null;
           created_at?: string;
           fee?: string;
           hash: string;
           id?: string;
-          packed_at?: string | null;
           payload?: Json | null;
           sender_id?: string | null;
           status?: Database['public']['Enums']['pnv_transaction_status'];
         };
         Update: {
-          assigned_height?: number | null;
-          assigned_slot?: number | null;
           block_id?: string | null;
           created_at?: string;
           fee?: string;
           hash?: string;
           id?: string;
-          packed_at?: string | null;
           payload?: Json | null;
           sender_id?: string | null;
           status?: Database['public']['Enums']['pnv_transaction_status'];
@@ -694,9 +685,214 @@ export interface Database {
           }
         ];
       };
+      pnv_assets: {
+        Row: {
+          code: string;
+          created_at: string;
+          decimals: number;
+          id: string;
+          max_supply: string | null;
+          metadata: Json | null;
+          name: string;
+          total_supply: string;
+        };
+        Insert: {
+          code: string;
+          created_at?: string;
+          decimals?: number;
+          id?: string;
+          max_supply?: string | null;
+          metadata?: Json | null;
+          name: string;
+          total_supply?: string;
+        };
+        Update: {
+          code?: string;
+          created_at?: string;
+          decimals?: number;
+          id?: string;
+          max_supply?: string | null;
+          metadata?: Json | null;
+          name?: string;
+          total_supply?: string;
+        };
+        Relationships: [];
+      };
+      pnv_wallets: {
+        Row: {
+          asset_id: string;
+          balance: string;
+          created_at: string;
+          id: string;
+          label: string | null;
+          owner_id: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          asset_id: string;
+          balance?: string;
+          created_at?: string;
+          id?: string;
+          label?: string | null;
+          owner_id?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          asset_id?: string;
+          balance?: string;
+          created_at?: string;
+          id?: string;
+          label?: string | null;
+          owner_id?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'pnv_wallets_asset_id_fkey';
+            columns: ['asset_id'];
+            isOneToOne: false;
+            referencedRelation: 'pnv_assets';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'pnv_wallets_owner_id_fkey';
+            columns: ['owner_id'];
+            isOneToOne: false;
+            referencedRelation: 'pnv_actors';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
+      pnv_wallet_transactions: {
+        Row: {
+          amount: string;
+          asset_id: string;
+          created_at: string;
+          from_wallet: string | null;
+          id: string;
+          memo: string | null;
+          to_wallet: string | null;
+        };
+        Insert: {
+          amount: string;
+          asset_id: string;
+          created_at?: string;
+          from_wallet?: string | null;
+          id?: string;
+          memo?: string | null;
+          to_wallet?: string | null;
+        };
+        Update: {
+          amount?: string;
+          asset_id?: string;
+          created_at?: string;
+          from_wallet?: string | null;
+          id?: string;
+          memo?: string | null;
+          to_wallet?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'pnv_wallet_transactions_asset_id_fkey';
+            columns: ['asset_id'];
+            isOneToOne: false;
+            referencedRelation: 'pnv_assets';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'pnv_wallet_transactions_from_wallet_fkey';
+            columns: ['from_wallet'];
+            isOneToOne: false;
+            referencedRelation: 'pnv_wallets';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'pnv_wallet_transactions_to_wallet_fkey';
+            columns: ['to_wallet'];
+            isOneToOne: false;
+            referencedRelation: 'pnv_wallets';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
+      pnv_demo_transactions: {
+        Row: {
+          amount: string;
+          block_group_id: string | null;
+          created_at: string | null;
+          from_account: string;
+          id: string;
+          status: string;
+          to_account: string;
+        };
+        Insert: {
+          amount: string;
+          block_group_id?: string | null;
+          created_at?: string | null;
+          from_account: string;
+          id?: string;
+          status?: string;
+          to_account: string;
+        };
+        Update: {
+          amount?: string;
+          block_group_id?: string | null;
+          created_at?: string | null;
+          from_account?: string;
+          id?: string;
+          status?: string;
+          to_account?: string;
+        };
+        Relationships: [];
+      };
+      pnv_demo_system_state: {
+        Row: {
+          id: boolean;
+        };
+        Insert: {
+          id?: boolean;
+        };
+        Update: {
+          id?: boolean;
+        };
+        Relationships: [];
+      };
     };
     Views: {};
-    Functions: {};
+    Functions: {
+      demo_get_dashboard_state: {
+        Args: Record<string, never>;
+        Returns: Database['public']['CompositeTypes']['demo_dashboard_state'];
+      };
+      demo_add_transaction: {
+        Args: { _from: string; _to: string; _amount: number };
+        Returns: string;
+      };
+      demo_start_consensus: {
+        Args: Record<string, never>;
+        Returns: string;
+      };
+      demo_cast_vote: {
+        Args: { _block_group_id: string; _commissioner_id: string; _approve: boolean };
+        Returns: string;
+      };
+      demo_finalize_block: {
+        Args: { _block_group_id: string; force?: boolean };
+        Returns: string;
+      };
+      demo_create_wallet: {
+        Args: { _owner: string | null; _label?: string | null };
+        Returns: string;
+      };
+      demo_mint_votalia: {
+        Args: { _wallet: string; _amount: number };
+        Returns: void;
+      };
+      demo_transfer_votalia: {
+        Args: { _from: string; _to: string; _amount: number; _memo?: string | null };
+        Returns: void;
+      };
+    };
     Enums: {
       pnv_actor_status: 'active' | 'inactive' | 'banned';
       pnv_block_group_status: 'pending' | 'voting' | 'confirmed' | 'timeout';
@@ -717,6 +913,9 @@ export interface Database {
         | 'confirmed'
         | 'rejected';
       pnv_vote_opinion: 'approve' | 'reject';
+    };
+    CompositeTypes: {
+      demo_dashboard_state: Json;
     };
   };
 }

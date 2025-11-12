@@ -1,0 +1,247 @@
+<nav class="fixed inset-x-0 top-0 z-30 px-6 py-5">
+  <div class="mx-auto flex w-full max-w-6xl items-center justify-between rounded-full border border-white/20 bg-white/10 px-6 py-3 backdrop-blur">
+    <a routerLink="/" class="flex items-center text-white">
+      <span class="relative h-16 w-16 overflow-visible">
+        <img
+          src="/images/logo/Votalia.png"
+          alt="Votalia"
+          class="absolute left-0 top-1/2 h-16 w-16 -translate-y-1/2 scale-[2] transform origin-left object-contain filter brightness-0 invert"
+        />
+      </span>
+    </a>
+
+    <div class="hidden items-center gap-6 text-sm font-medium text-white/80 md:flex">
+      <a routerLink="/dashboard" class="hover:text-white">Panel PnV</a>
+      <a routerLink="/block-groups" class="hover:text-white">Grupos</a>
+      <a routerLink="/transactions" class="hover:text-white">Transacciones</a>
+      <a routerLink="/global-tps" class="hover:text-white">Global TPS</a>
+    </div>
+
+    <a
+      routerLink="/dashboard"
+      class="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2 text-xs font-semibold uppercase tracking-widest text-purple-800 shadow-lg shadow-purple-900/30 transition hover:bg-emerald-200 hover:text-purple-900"
+    >
+      Ir al panel
+      <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+        <path d="m9 18 6-6-6-6" />
+      </svg>
+    </a>
+  </div>
+</nav>
+
+<section class="relative z-10 flex min-h-screen flex-col items-center justify-center px-6 pb-16 pt-32 text-center text-white">
+  <div class="mx-auto max-w-3xl space-y-6">
+    <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs uppercase tracking-[0.4em] text-white/80">
+      Protocolo Proof-of-Vote
+    </span>
+
+    <h1 class="text-4xl font-semibold leading-tight md:text-5xl lg:text-6xl">
+      Gobernanza financiera resiliente sobre un
+      <span class="text-emerald-300">consenso verificable</span>
+    </h1>
+
+    <p class="text-base text-white/80 md:text-lg">
+      Votalia ofrece una capa blockchain optimizada para redes bancarias. Visualiza nodos, transacciones y métricas en tiempo real con
+      Supabase y un motor PnV preparado para producción.
+    </p>
+
+    <div class="flex flex-col items-center justify-center gap-4 sm:flex-row">
+      <a
+        routerLink="/dashboard"
+        class="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-purple-800 shadow-lg shadow-purple-900/40 transition hover:bg-emerald-200 hover:text-purple-900"
+      >
+        Entrar al panel
+      </a>
+
+      <a
+        routerLink="/block-groups"
+        class="inline-flex items-center justify-center rounded-full border border-white/40 px-6 py-3 text-sm font-semibold text-white/80 transition hover:border-white hover:text-white"
+      >
+        Explorar bloques
+      </a>
+    </div>
+
+    <div class="mt-10 flex justify-center">
+      <app-planet-effect class="max-w-xl"></app-planet-effect>
+    </div>
+  </div>
+
+  <div class="absolute inset-x-0 bottom-8 flex justify-center text-xs text-white/60">
+    Arrastra con el ratón para interactuar con la malla
+  </div>
+</section>
+
+<section class="relative z-20 mx-auto w-full max-w-5xl px-6 pb-10">
+  <div class="rounded-3xl border border-white/20 bg-white/10 p-8 text-white backdrop-blur">
+    <header class="mb-5 space-y-2">
+      <span class="text-xs uppercase tracking-[0.35em] text-white/60">Investigación Validada</span>
+      <h2 class="text-2xl font-semibold md:text-3xl">PnV: consenso paralelo que une prueba y votación</h2>
+      <p class="text-sm text-white/70">
+        Nuestro simulador y panel se apoyan en los avances descritos por Wang et al. en “PnV: An Efficient Parallel Consensus Protocol Integrating Proof and Voting” (<a class="underline decoration-white/40 hover:text-white" href="https://www.mdpi.com/2076-3417/14/8/3510" target="_blank" rel="noopener noreferrer">Appl. Sci. 2024, 14, 3510</a>).
+      </p>
+    </header>
+    <div class="grid gap-4 md:grid-cols-2">
+      <article class="rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-5">
+        <h3 class="text-lg font-semibold text-emerald-100">Bloques en paralelo</h3>
+        <p class="mt-2 text-sm text-white/80">
+          PnV introduce el concepto de <em>block groups</em> para que varios bookkeepers generen bloques simultáneamente dentro de una misma ronda, sin duplicar transacciones gracias al mecanismo de asignación determinista.
+        </p>
+      </article>
+      <article class="rounded-2xl border border-blue-400/30 bg-blue-500/10 p-5">
+        <h3 class="text-lg font-semibold text-blue-100">Escalabilidad y eficiencia</h3>
+        <p class="mt-2 text-sm text-white/80">
+          Las pruebas reportan picos de más de 350&nbsp;mil tx/s y una eficiencia hasta 5× superior a PoV y BFT-SMART, manteniendo retardos aceptables y reduciendo la presión de comunicación mediante paralelización y votación fusionada.
+        </p>
+      </article>
+      <article class="rounded-2xl border border-yellow-400/30 bg-yellow-500/10 p-5">
+        <h3 class="text-lg font-semibold text-yellow-100">Tolerancia y control</h3>
+        <p class="mt-2 text-sm text-white/80">
+          Los mecanismos de asignación de transacciones, manejo de timeouts y rotación de líderes preservan la finalización del consenso incluso ante fallos de votantes, bookkeepers o líderes.
+        </p>
+      </article>
+      <article class="rounded-2xl border border-purple-400/30 bg-purple-500/10 p-5">
+        <h3 class="text-lg font-semibold text-purple-100">Validación sistémica</h3>
+        <p class="mt-2 text-sm text-white/80">
+          En comparación con FISCO&nbsp;BCOS, el prototipo basado en PnV obtiene un rendimiento 4× superior en escenarios empresariales, demostrando viabilidad para consorcios financieros exigentes.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="relative z-20 mx-auto w-full max-w-6xl px-6 pb-20">
+  <div class="rounded-3xl border border-white/10 bg-white/10 p-8 backdrop-blur">
+    <header class="mb-8 flex flex-col gap-2 text-white">
+      <span class="text-xs uppercase tracking-[0.35em] text-white/60">Observatorio Global</span>
+      <h2 class="text-2xl font-semibold md:text-3xl">Demanda mundial de pagos en tiempo real</h2>
+      <p class="text-sm text-white/70 md:text-base">
+        Ajusta la población activa, el uso diario y los picos horarios para dimensionar la infraestructura de pagos.
+      </p>
+    </header>
+
+    <section class="mb-10 grid gap-6 lg:grid-cols-4">
+      <article class="rounded-2xl border border-white/20 bg-white/5 p-4 text-white">
+        <header class="mb-2 text-xs uppercase tracking-wide text-white/60">Población mundial (millones)</header>
+        <input
+          type="range"
+          min="2000"
+          max="10000"
+          step="100"
+          [value]="worldPopulation()"
+          (input)="onPopulationChange($any($event.target).value)"
+          class="w-full accent-purple-200"
+        />
+        <div class="mt-3 text-xl font-semibold">{{ worldPopulation() | number }} M</div>
+      </article>
+
+      <article class="rounded-2xl border border-white/20 bg-white/5 p-4 text-white">
+        <header class="mb-2 text-xs uppercase tracking-wide text-white/60">Adopción digital (%)</header>
+        <input
+          type="range"
+          min="20"
+          max="100"
+          step="5"
+          [value]="activePercent()"
+          (input)="onActivePercentChange($any($event.target).value)"
+          class="w-full accent-purple-200"
+        />
+        <div class="mt-3 text-xl font-semibold">{{ highlights().activeLabel }}</div>
+      </article>
+
+      <article class="rounded-2xl border border-white/20 bg-white/5 p-4 text-white">
+        <header class="mb-2 text-xs uppercase tracking-wide text-white/60">Pagos por persona / día</header>
+        <input
+          type="range"
+          min="1"
+          max="30"
+          step="1"
+          [value]="txPerDay()"
+          (input)="onTxPerDayChange($any($event.target).value)"
+          class="w-full accent-purple-200"
+        />
+        <div class="mt-3 text-xl font-semibold">{{ txPerDay() }} transacciones</div>
+      </article>
+
+      <article class="rounded-2xl border border-white/20 bg-white/5 p-4 text-white">
+        <header class="mb-2 text-xs uppercase tracking-wide text-white/60">Multiplicador de hora punta</header>
+        <input
+          type="range"
+          min="2"
+          max="20"
+          step="1"
+          [value]="peakMultiplier()"
+          (input)="onPeakMultiplierChange($any($event.target).value)"
+          class="w-full accent-purple-200"
+        />
+        <div class="mt-3 text-xl font-semibold">{{ peakMultiplier() }}x</div>
+      </article>
+    </section>
+
+    <div class="grid gap-4 lg:grid-cols-4">
+      <article class="rounded-2xl border border-white/20 bg-white/10 p-5 text-white shadow-lg shadow-purple-900/30">
+        <header class="mb-3 text-xs uppercase tracking-wide text-white/60">Población activa</header>
+        <div class="text-3xl font-semibold">{{ highlights().activeLabel }}</div>
+        <p class="mt-2 text-xs text-white/70">Usuarios digitales diarios en redes de pago.</p>
+      </article>
+
+      <article class="rounded-2xl border border-emerald-400/40 bg-emerald-500/10 p-5 text-white shadow-lg shadow-emerald-900/30">
+        <header class="mb-3 text-xs uppercase tracking-wide text-emerald-200">TX diarias</header>
+        <div class="text-3xl font-semibold text-emerald-100">{{ highlights().dailyTxBillions }}B</div>
+        <p class="mt-2 text-xs text-emerald-100/80">Miles de millones de pagos que exige la economía digital.</p>
+      </article>
+
+      <article class="rounded-2xl border border-blue-400/40 bg-blue-500/10 p-5 text-white shadow-lg shadow-blue-900/30">
+        <header class="mb-3 text-xs uppercase tracking-wide text-blue-200">TPS promedio</header>
+        <div class="text-3xl font-semibold text-blue-100">{{ highlights().avgTps }}</div>
+        <p class="mt-2 text-xs text-blue-100/80">Capacidad continua necesaria cada segundo del día.</p>
+      </article>
+
+      <article class="rounded-2xl border border-yellow-400/40 bg-yellow-500/10 p-5 text-white shadow-lg shadow-yellow-900/30">
+        <header class="mb-3 text-xs uppercase tracking-wide text-yellow-200">TPS pico</header>
+        <div class="text-3xl font-semibold text-yellow-100">{{ highlights().peakTps }}</div>
+        <p class="mt-2 text-xs text-yellow-100/80">Demanda máxima en ventanas de congestión global.</p>
+      </article>
+    </div>
+
+    <div class="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <article class="rounded-2xl border border-green-500/40 bg-green-500/10 p-4 text-white">
+        <header class="mb-2 text-sm font-semibold text-green-100">Federaciones PPoV</header>
+        <div class="text-2xl font-semibold text-green-50">{{ highlights().ppovNeeded }}</div>
+        <p class="mt-1 text-xs text-green-50/80">Consorcios independientes para cubrir el pico global.</p>
+      </article>
+
+      <article class="rounded-2xl border border-blue-500/40 bg-blue-500/10 p-4 text-white">
+        <header class="mb-2 text-sm font-semibold text-blue-100">Redes Visa</header>
+        <div class="text-2xl font-semibold text-blue-50">{{ highlights().visaNeeded }}</div>
+        <p class="mt-1 text-xs text-blue-50/80">Plataformas regionales coordinadas a 1,700 TPS reales.</p>
+      </article>
+
+      <article class="rounded-2xl border border-purple-500/40 bg-purple-500/10 p-4 text-white">
+        <header class="mb-2 text-sm font-semibold text-purple-100">Blockchains Solana</header>
+        <div class="text-2xl font-semibold text-purple-50">{{ highlights().solanaNeeded }}</div>
+        <p class="mt-1 text-xs text-purple-50/80">Instancias independientes basadas en rendimiento real.</p>
+      </article>
+
+      <article class="rounded-2xl border border-rose-500/40 bg-rose-500/10 p-4 text-white">
+        <header class="mb-2 text-sm font-semibold text-rose-100">Polygon PoS</header>
+        <div class="text-2xl font-semibold text-rose-50">{{ highlights().polygonNeeded }}</div>
+        <p class="mt-1 text-xs text-rose-50/80">Cantidad de cadenas PoS necesarias al throughput actual.</p>
+      </article>
+    </div>
+
+    <footer class="mt-8 flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-xs text-white/60 md:flex-row md:items-center md:justify-between">
+      <span>
+        Cálculos rápidos basados en el simulador <strong class="text-white">Global TPS</strong>.
+      </span>
+      <a routerLink="/global-tps" class="inline-flex items-center gap-2 text-white/80 hover:text-white">
+        Abrir análisis interactivo
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M5 12h14" />
+          <path d="m12 5 7 7-7 7" />
+        </svg>
+      </a>
+    </footer>
+  </div>
+</section>
+
+

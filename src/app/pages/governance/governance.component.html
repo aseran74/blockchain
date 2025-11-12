@@ -1,0 +1,253 @@
+<section class="space-y-6">
+  <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div class="space-y-2">
+      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Gobernanza y votaciones</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Supervisión del comité de commissioners, rondas de consenso y resultados del protocolo PnV.
+      </p>
+    </div>
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="rounded-lg border border-gray-200 px-4 py-2 text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400">
+        Última actualización: {{ formatTimestamp(lastUpdated()) }}
+      </div>
+      <button
+        type="button"
+        class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-brand-500 hover:text-brand-600 dark:border-gray-700 dark:text-gray-200 dark:hover:border-brand-400"
+        (click)="refresh()"
+      >
+        <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+        Actualizar
+      </button>
+    </div>
+  </header>
+
+  @if (loadError()) {
+    <div class="rounded-lg border border-rose-400 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+      {{ loadError() }}
+    </div>
+  }
+
+  <div class="grid gap-3 md:grid-cols-3 lg:grid-cols-6">
+    <article class="rounded-xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <h3 class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">Commissioners</h3>
+      <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">{{ summary().commissionersTotal }}</p>
+      <p class="text-xs text-gray-500 dark:text-gray-400">Activos: {{ summary().commissionersOnline }}</p>
+    </article>
+    <article class="rounded-xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <h3 class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">Bloques confirmados</h3>
+      <p class="mt-2 text-2xl font-semibold text-emerald-500 dark:text-emerald-300">{{ summary().blocksConfirmed }}</p>
+    </article>
+    <article class="rounded-xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <h3 class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">Rondas activas</h3>
+      <p class="mt-2 text-2xl font-semibold text-amber-500 dark:text-amber-300">{{ summary().blocksVoting }}</p>
+    </article>
+    <article class="rounded-xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <h3 class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">Votos totales</h3>
+      <p class="mt-2 text-2xl font-semibold text-blue-500 dark:text-blue-300">{{ summary().totalVotes }}</p>
+    </article>
+    <article class="rounded-xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <h3 class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">Mayoría requerida</h3>
+      <p class="mt-2 text-2xl font-semibold text-gray-900 dark:text-white">{{ summary().majorityThreshold }}</p>
+      <p class="text-xs text-gray-500 dark:text-gray-400">Nc/2 + 1</p>
+    </article>
+    <article class="rounded-xl border border-gray-100 bg-white/80 p-4 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <h3 class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">Participación global</h3>
+      <p class="mt-2 text-2xl font-semibold text-purple-500 dark:text-purple-300">{{ summary().participation }}%</p>
+      <p class="text-xs text-gray-500 dark:text-gray-400">Ronda activa: {{ summary().activeParticipation }}%</p>
+    </article>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-2">
+    <section class="space-y-4 rounded-2xl border border-gray-100 bg-white/80 p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <header class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Ronda de consenso</h2>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            Estado actual del bloque en proceso de votación.
+          </p>
+        </div>
+        <span class="rounded-full border border-gray-200 px-3 py-1 text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400">
+          {{ activeRound()?.status ?? 'Sin ronda' }}
+        </span>
+      </header>
+
+      @if (activeRound(); as round) {
+        <div class="rounded-xl border border-gray-100 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-800/60">
+          <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h3 class="text-base font-semibold text-gray-900 dark:text-white">Bloque #{{ round.height }}</h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                Lider: {{ round.butler_name ?? '—' }} • Creado {{ formatTimestamp(round.created_at) }}
+              </p>
+            </div>
+            <div class="text-sm text-gray-500 dark:text-gray-300">
+              Firmas: {{ activeVotes().length }}/{{ summary().majorityThreshold }}
+            </div>
+          </div>
+          <div class="mt-4 grid gap-3 md:grid-cols-2">
+            @for (vote of activeVotes(); track vote.id) {
+              <div class="rounded-lg border border-gray-200 bg-white/70 p-3 text-sm dark:border-gray-700 dark:bg-gray-900/70">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="font-medium text-gray-900 dark:text-white">{{ vote.commissionerName }}</span>
+                  <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold" [ngClass]="voteStatusClass(vote.approve)">
+                    {{ vote.approve ? 'Aprueba' : 'Rechaza' }}
+                  </span>
+                </div>
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  {{ formatTimestamp(vote.votedAt) }}
+                </p>
+              </div>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="rounded-xl border border-dashed border-gray-200 bg-white/60 p-10 text-center text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-400">
+          No hay rondas de consenso activas ahora mismo.
+        </div>
+      }
+    </section>
+
+    <section class="space-y-4 rounded-2xl border border-gray-100 bg-white/80 p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <header class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Comisión de governance</h2>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            Estado en línea y peso de voto por commissioner.
+          </p>
+        </div>
+        <span class="rounded-full border border-gray-200 px-3 py-1 text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400">
+          {{ commissioners().length }} miembros
+        </span>
+      </header>
+
+      <div class="grid gap-3 sm:grid-cols-2">
+        @for (commissioner of commissioners(); track commissioner.id) {
+          <article class="rounded-xl border border-gray-100 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-800/60">
+            <div class="flex items-center justify-between gap-2">
+              <div>
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-white">{{ commissioner.name }}</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400">{{ commissioner.region ?? '—' }}</p>
+              </div>
+              <span
+                class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold"
+                [ngClass]="commissioner.online ? 'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300' : 'bg-gray-500/10 text-gray-600 dark:bg-gray-500/20 dark:text-gray-400'"
+              >
+                {{ commissioner.online ? 'En línea' : 'Desconectado' }}
+              </span>
+            </div>
+            <dl class="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-500 dark:text-gray-400">
+              <div>
+                <dt>Peso de voto</dt>
+                <dd class="font-semibold text-gray-900 dark:text-white">{{ formatNumber(commissioner.voteWeight) }}</dd>
+              </div>
+              <div>
+                <dt>Desde</dt>
+                <dd>{{ formatTimestamp(commissioner.created_at) }}</dd>
+              </div>
+            </dl>
+          </article>
+        }
+      </div>
+    </section>
+  </div>
+
+  <section class="space-y-4 rounded-2xl border border-gray-100 bg-white/80 p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    <header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Histórico de votos</h2>
+        <p class="text-xs text-gray-500 dark:text-gray-400">Resumen de decisiones recientes por commissioner.</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <div class="flex flex-wrap gap-2">
+          <button
+            type="button"
+            class="rounded-lg border px-3 py-1.5 text-xs font-medium transition"
+            [ngClass]="selectedOutcome() === 'all'
+              ? 'border-brand-500 bg-brand-500/10 text-brand-600 dark:border-brand-400 dark:bg-brand-500/20 dark:text-brand-300'
+              : 'border-gray-200 text-gray-600 hover:border-brand-200 dark:border-gray-700 dark:text-gray-300'"
+            (click)="setOutcome('all')"
+          >
+            Todos
+          </button>
+          <button
+            type="button"
+            class="rounded-lg border px-3 py-1.5 text-xs font-medium transition"
+            [ngClass]="selectedOutcome() === 'approved'
+              ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:border-emerald-400 dark:bg-emerald-500/20 dark:text-emerald-300'
+              : 'border-gray-200 text-gray-600 hover:border-brand-200 dark:border-gray-700 dark:text-gray-300'"
+            (click)="setOutcome('approved')"
+          >
+            Aprobados
+          </button>
+          <button
+            type="button"
+            class="rounded-lg border px-3 py-1.5 text-xs font-medium transition"
+            [ngClass]="selectedOutcome() === 'rejected'
+              ? 'border-rose-500 bg-rose-500/10 text-rose-600 dark:border-rose-400 dark:bg-rose-500/20 dark:text-rose-300'
+              : 'border-gray-200 text-gray-600 hover:border-brand-200 dark:border-gray-700 dark:text-gray-300'"
+            (click)="setOutcome('rejected')"
+          >
+            Rechazados
+          </button>
+        </div>
+        <div class="relative w-full md:w-64">
+          <input
+            type="search"
+            class="w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-brand-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+            placeholder="Buscar por bloque o commissioner"
+            [value]="searchTerm()"
+            (input)="onSearchChange($any($event.target).value)"
+          />
+          @if (searchTerm()) {
+            <button
+              type="button"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              (click)="clearSearch()"
+            >
+              Limpiar
+            </button>
+          }
+        </div>
+      </div>
+    </header>
+
+    @if (filteredVotes().length === 0) {
+      <div class="rounded-xl border border-dashed border-gray-200 bg-white/60 p-10 text-center text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-400">
+        No hay votos que coincidan con los filtros seleccionados.
+      </div>
+    } @else {
+      <div class="overflow-hidden rounded-xl border border-gray-100 dark:border-gray-800">
+        <div class="hidden min-w-full bg-gray-50 text-xs font-semibold uppercase text-gray-500 dark:bg-gray-800 dark:text-gray-400 md:grid md:grid-cols-[160px_1fr_1fr_140px] md:gap-3 md:px-4 md:py-3">
+          <span>Bloque</span>
+          <span>Commissioner</span>
+          <span>Decisión</span>
+          <span>Fecha</span>
+        </div>
+
+        <div class="divide-y divide-gray-100 dark:divide-gray-800">
+          @for (vote of filteredVotes(); track vote.id) {
+            <article class="grid min-w-full gap-3 px-4 py-4 text-sm text-gray-700 dark:text-gray-200 md:grid-cols-[160px_1fr_1fr_140px]">
+              <div>
+                <p class="font-semibold text-gray-900 dark:text-white">Bloque #{{ vote.blockHeight ?? '—' }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ vote.blockId }}</p>
+              </div>
+              <div>
+                <p class="font-medium text-gray-900 dark:text-white">{{ vote.commissionerName }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">ID: {{ vote.commissionerId }}</p>
+              </div>
+              <div>
+                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold" [ngClass]="voteStatusClass(vote.approve)">
+                  {{ vote.approve ? 'Aprueba' : 'Rechaza' }}
+                </span>
+              </div>
+              <div class="text-xs text-gray-500 dark:text-gray-400">
+                {{ formatTimestamp(vote.votedAt) }}
+              </div>
+            </article>
+          }
+        </div>
+      </div>
+    }
+  </section>
+</section>
+

@@ -2,14 +2,16 @@ import { Component, OnDestroy, OnInit, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { PlanetEffectComponent } from '../../shared/components/effects/planet-effect/planet-effect.component';
+import { PpoVInfoModalComponent } from '../../shared/components/info/ppov-info-modal/ppov-info-modal.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, PlanetEffectComponent],
+  imports: [CommonModule, RouterModule, PlanetEffectComponent, PpoVInfoModalComponent],
   templateUrl: './home.component.html',
 })
 export class HomeComponent implements OnInit, OnDestroy {
+  readonly isPpoVModalOpen = signal(false);
   private readonly numberFormatter = new Intl.NumberFormat('es-ES');
   private readonly decimalFormatter = new Intl.NumberFormat('es-ES', {
     maximumFractionDigits: 2,

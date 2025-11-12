@@ -1,0 +1,286 @@
+<app-modal
+  [isOpen]="isOpen"
+  (close)="closeModal()"
+  className="max-w-4xl max-h-[90vh] overflow-y-auto"
+>
+  <div class="p-6 sm:p-8">
+    <!-- Header -->
+    <div class="mb-6">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+        Protocolo PPoV (PnV)
+      </h2>
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Un Protocolo de Consenso Paralelo Eficiente que Integra Prueba y Votación
+      </p>
+    </div>
+
+    <!-- Resumen Ejecutivo -->
+    <div class="mb-8 rounded-xl border-2 border-indigo-200 bg-indigo-50/50 dark:border-indigo-800 dark:bg-indigo-900/20 p-6">
+      <h3 class="text-lg font-semibold text-indigo-900 dark:text-indigo-200 mb-4 flex items-center gap-2">
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        Resumen Ejecutivo
+      </h3>
+      <div class="space-y-4 text-sm text-gray-700 dark:text-gray-300">
+        <p class="font-medium text-gray-900 dark:text-white">
+          PnV es un nuevo protocolo de consenso para <strong>blockchains privadas (consorcios)</strong> que combina votación y prueba de participación, permitiendo que <strong>múltiples nodos generen bloques en paralelo</strong> dentro de la misma ronda de consenso.
+        </p>
+        
+        <div class="space-y-3">
+          <div>
+            <h4 class="font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+              <span class="text-rose-600 dark:text-rose-400">🔍</span>
+              Problema Actual
+            </h4>
+            <ul class="list-disc list-inside space-y-1 ml-4 text-xs">
+              <li>Los protocolos de consenso tradicionales (votación o prueba) <strong>no escalan bien</strong></li>
+              <li>La mayoría son <strong>seriados</strong>, lo que limita el rendimiento</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+              <span class="text-emerald-600 dark:text-emerald-400">✅</span>
+              Solución Propuesta: PnV
+            </h4>
+            <ul class="list-disc list-inside space-y-1 ml-4 text-xs">
+              <li><strong>Fusión</strong> de votación y prueba con paralelización</li>
+              <li>Varios <strong>bookkeepers generan bloques simultáneamente</strong> en una misma ronda</li>
+              <li>Usa <strong>grupos de bloques (block group)</strong> en lugar de bloques individuales</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+              <span class="text-blue-600 dark:text-blue-400">👥</span>
+              Roles en la Red
+            </h4>
+            <ul class="list-disc list-inside space-y-1 ml-4 text-xs">
+              <li><strong>Votantes:</strong> supervisan y votan la validez de los bloques</li>
+              <li><strong>Bookkeepers:</strong> generan bloques</li>
+              <li><strong>Candidatos a bookkeeper:</strong> pueden ser elegidos en el futuro</li>
+              <li><strong>Líder:</strong> recolecta votos y emite el resultado</li>
+              <li><strong>Usuarios:</strong> solo envían transacciones</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+              <span class="text-purple-600 dark:text-purple-400">⚙️</span>
+              Mecanismos Clave
+            </h4>
+            <ul class="list-disc list-inside space-y-1 ml-4 text-xs">
+              <li><strong>Asignación de transacciones:</strong> evita duplicados al asignar cada transacción a un bookkeeper específico</li>
+              <li><strong>Manejo de timeouts:</strong> garantiza que el consenso termine incluso si fallan nodos</li>
+              <li><strong>Tres fases:</strong> proponer, votar y confirmar</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-semibold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+              <span class="text-amber-600 dark:text-amber-400">📊</span>
+              Rendimiento
+            </h4>
+            <ul class="list-disc list-inside space-y-1 ml-4 text-xs">
+              <li>Hasta <strong>350,000 transacciones por segundo</strong> en pruebas</li>
+              <li><strong>5 veces más rápido</strong> que PoV y BFT-SMART</li>
+              <li><strong>4 veces más rápido</strong> que FISCO BCOS (plataforma empresarial china)</li>
+            </ul>
+          </div>
+
+          <div class="pt-2 border-t border-indigo-200 dark:border-indigo-800">
+            <p class="font-semibold text-gray-900 dark:text-white text-xs">
+              Conclusión: PnV mejora escalabilidad, eficiencia y tolerancia a fallos en blockchains de consorcio. Es una propuesta práctica y lista para implementarse en sistemas reales.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Separador -->
+    <div class="mb-6 flex items-center gap-4">
+      <div class="flex-1 border-t border-gray-200 dark:border-gray-700"></div>
+      <span class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">Versión Extendida</span>
+      <div class="flex-1 border-t border-gray-200 dark:border-gray-700"></div>
+    </div>
+
+    <!-- Contenido Extendido -->
+    <div class="space-y-6 text-sm text-gray-700 dark:text-gray-300">
+      
+      <!-- Problema -->
+      <section>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+          <span class="flex h-6 w-6 items-center justify-center rounded-full bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400">
+            1
+          </span>
+          El Problema
+        </h3>
+        <div class="ml-8 space-y-2">
+          <p>
+            Los protocolos de consenso tradicionales enfrentan <strong>problemas de escalabilidad</strong>:
+          </p>
+          <ul class="list-disc list-inside space-y-1 ml-4">
+            <li>Protocolos basados en <strong>votación</strong> (PBFT, BFT-SMART) tienen limitaciones de recursos de comunicación</li>
+            <li>Protocolos basados en <strong>prueba</strong> (PoW, PoS) tienen limitaciones de capacidad de cálculo</li>
+            <li>La mayoría son <strong>serializados</strong> (un bloque por ronda), limitando el rendimiento</li>
+            <li>Los protocolos de <strong>fusión</strong> (como PoV) mejoran la escalabilidad pero carecen de paralelización</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Solución -->
+      <section>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+          <span class="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
+            2
+          </span>
+          La Solución: PPoV
+        </h3>
+        <div class="ml-8 space-y-3">
+          <p>
+            <strong>PPoV (PnV)</strong> es un protocolo de <strong>fusión paralela</strong> que integra características de consenso basadas en prueba y basadas en votación.
+          </p>
+          <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
+            <p class="font-medium text-gray-900 dark:text-white mb-2">Características clave:</p>
+            <ul class="list-disc list-inside space-y-1 ml-4">
+              <li><strong>Paralelización:</strong> Generación simultánea de bloques por múltiples nodos</li>
+              <li><strong>Grupos de Bloques:</strong> Estructura de datos novedosa que permite consenso paralelo</li>
+              <li><strong>Rendimiento mejorado:</strong> Hasta 5x más rápido que PoV y BFT-SMART</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Roles -->
+      <section>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+          <span class="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+            3
+          </span>
+          Roles en la Red
+        </h3>
+        <div class="ml-8 space-y-3">
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+              <h4 class="font-semibold text-blue-900 dark:text-blue-300 mb-1">👥 Votantes</h4>
+              <p class="text-xs text-gray-600 dark:text-gray-400">
+                Supervisan la red, verifican bloques y eligen contadores. Requieren más de <strong>2/3 de aprobación</strong> para validar bloques.
+              </p>
+            </div>
+            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+              <h4 class="font-semibold text-purple-900 dark:text-purple-300 mb-1">📝 Contadores</h4>
+              <p class="text-xs text-gray-600 dark:text-gray-400">
+                Generan bloques en <strong>paralelo</strong> durante cada ronda de consenso. Cada contador produce un bloque por grupo de bloques.
+              </p>
+            </div>
+            <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4">
+              <h4 class="font-semibold text-amber-900 dark:text-amber-300 mb-1">🎯 Líder</h4>
+              <p class="text-xs text-gray-600 dark:text-gray-400">
+                Recopila y cuenta los votos de los votantes. Se elige <strong>al azar</strong> para cada grupo de bloques.
+              </p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
+              <h4 class="font-semibold text-gray-900 dark:text-gray-300 mb-1">👤 Usuarios</h4>
+              <p class="text-xs text-gray-600 dark:text-gray-400">
+                Nodos que pueden recibir datos y publicar transacciones, pero no participan directamente en el consenso.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Proceso de Consenso -->
+      <section>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+          <span class="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
+            4
+          </span>
+          Proceso de Consenso (3 Fases)
+        </h3>
+        <div class="ml-8 space-y-4">
+          <div class="flex gap-4">
+            <div class="flex flex-col items-center">
+              <div class="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 font-semibold">
+                1
+              </div>
+              <div class="h-16 w-0.5 bg-gray-200 dark:bg-gray-700"></div>
+            </div>
+            <div class="flex-1 pb-4">
+              <h4 class="font-semibold text-gray-900 dark:text-white mb-1">Proponer</h4>
+              <p class="text-xs text-gray-600 dark:text-gray-400">
+                Los contadores seleccionan transacciones y generan bloques en <strong>paralelo</strong>, difundiéndolos a la red.
+              </p>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <div class="flex flex-col items-center">
+              <div class="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 font-semibold">
+                2
+              </div>
+              <div class="h-16 w-0.5 bg-gray-200 dark:bg-gray-700"></div>
+            </div>
+            <div class="flex-1 pb-4">
+              <h4 class="font-semibold text-gray-900 dark:text-white mb-1">Votar</h4>
+              <p class="text-xs text-gray-600 dark:text-gray-400">
+                Los votantes verifican cada bloque y envían sus votos (aprobación/rechazo) al líder.
+              </p>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <div class="flex flex-col items-center">
+              <div class="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 font-semibold">
+                3
+              </div>
+            </div>
+            <div class="flex-1">
+              <h4 class="font-semibold text-gray-900 dark:text-white mb-1">Confirmar</h4>
+              <p class="text-xs text-gray-600 dark:text-gray-400">
+                Si los bloques obtienen más de <strong>2/3 de aprobación</strong>, el líder genera el encabezado del grupo de bloques y lo difunde.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Resultados -->
+      <section>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+          <span class="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
+            5
+          </span>
+          Resultados y Beneficios
+        </h3>
+        <div class="ml-8 space-y-2">
+          <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-3 text-center">
+              <div class="text-xl font-bold text-emerald-600 dark:text-emerald-400 mb-1">350K</div>
+              <p class="text-xs text-gray-600 dark:text-gray-400">tx/s en pruebas</p>
+            </div>
+            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 text-center">
+              <div class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1">5x</div>
+              <p class="text-xs text-gray-600 dark:text-gray-400">Más rápido que PoV y BFT-SMART</p>
+            </div>
+            <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3 text-center">
+              <div class="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1">4x</div>
+              <p class="text-xs text-gray-600 dark:text-gray-400">Mejora vs FISCO BCOS</p>
+            </div>
+            <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-3 text-center">
+              <div class="text-2xl font-bold text-amber-600 dark:text-amber-400 mb-1">✓</div>
+              <p class="text-xs text-gray-600 dark:text-gray-400">Latencia aceptable</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <div class="pt-4 border-t border-gray-200 dark:border-gray-700 mt-6">
+        <p class="text-xs text-gray-500 dark:text-gray-400 text-center">
+          Basado en la investigación: <em>"PnV: A Parallel and Efficient Consensus Protocol Integrating Proof and Voting"</em><br>
+          Han Wang, Hui Li, et al. - Universidad de Pekín, Shenzhen
+        </p>
+      </div>
+    </div>
+  </div>
+</app-modal>
+

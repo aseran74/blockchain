@@ -46,14 +46,16 @@ const assignEnvToGlobals = (source: Record<string, string | undefined> = {}) => 
   }
 };
 
-const loadRuntimeEnv = async () => {
+const loadRuntimeEnv = async (): Promise<void> => {
   try {
     const response = await fetch('/env-config.json', { cache: 'no-cache' });
     if (!response.ok) {
+      console.warn('No se pudo cargar env-config.json, usando variables de entorno del build');
       return;
     }
     const runtimeEnv = (await response.json()) as Record<string, string | undefined>;
     assignEnvToGlobals(runtimeEnv);
+    console.log('✅ Variables de entorno cargadas desde env-config.json');
   } catch (error) {
     console.warn('No se pudo cargar env-config.json:', error);
   }
@@ -74,8 +76,28 @@ assignEnvToGlobals({
 });
 }
 
+// Cargar variables de entorno ANTES de inicializar Angular
 const bootstrap = async () => {
+  // Cargar env-config.json primero
   await loadRuntimeEnv();
+  
+  // Verificar que las variables estén disponibles antes de continuar
+  const url = (globalThis as unknown as Record<string, string | undefined>)['NG_APP_SUPABASE_URL'] ||
+              (globalThis as unknown as Record<string, string | undefined>)['SUPABASE_URL'];
+  const key = (globalThis as unknown as Record<string, string | undefined>)['NG_APP_SUPABASE_ANON_KEY'] ||
+              (globalThis as unknown as Record<string, string | undefined>)['SUPABASE_ANON_KEY'];
+  
+  if (!url || !key) {
+    console.error('❌ Variables de entorno no disponibles después de cargar env-config.json');
+    console.error('URL:', url ? '✓' : '✗');
+    console.error('KEY:', key ? '✓' : '✗');
+    // Intentar leer desde window.__env como último recurso
+    const windowEnv = (globalThis as unknown as { __env?: Record<string, string | undefined> }).__env;
+    if (windowEnv) {
+      assignEnvToGlobals(windowEnv);
+    }
+  }
+  
   bootstrapApplication(AppComponent, appConfig).catch((err) => console.error(err));
 };
 

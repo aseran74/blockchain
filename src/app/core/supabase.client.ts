@@ -9,23 +9,31 @@ declare const process:
     };
 
 const readEnv = (key: string): string | undefined => {
-  const fromProcess = typeof process !== 'undefined' ? process?.env?.[key] : undefined;
-  if (fromProcess) {
-    return fromProcess;
+  // 1. Intentar desde globalThis (donde main.ts las coloca)
+  const fromGlobal = (globalThis as unknown as Record<string, string | undefined>)[key];
+  if (fromGlobal) {
+    return fromGlobal;
   }
 
-  const metaEnv = (import.meta as unknown as { env?: Record<string, string | undefined> })?.env;
-  if (metaEnv?.[key]) {
-    return metaEnv[key];
-  }
-
+  // 2. Intentar desde window.__env
   const windowEnv = (globalThis as unknown as { __env?: Record<string, string | undefined> }).__env;
   if (windowEnv?.[key]) {
     return windowEnv[key];
   }
 
-  const fromGlobal = (globalThis as unknown as Record<string, string | undefined>)[key];
-  return fromGlobal;
+  // 3. Intentar desde process.env (build time)
+  const fromProcess = typeof process !== 'undefined' ? process?.env?.[key] : undefined;
+  if (fromProcess) {
+    return fromProcess;
+  }
+
+  // 4. Intentar desde import.meta.env (Vite/Angular)
+  const metaEnv = (import.meta as unknown as { env?: Record<string, string | undefined> })?.env;
+  if (metaEnv?.[key]) {
+    return metaEnv[key];
+  }
+
+  return undefined;
 };
 
 const resolveConfig = () => {

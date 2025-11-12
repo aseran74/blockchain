@@ -303,5 +303,220 @@ export class SupabaseDataService {
         .maybeSingle()
     );
   }
+
+  // ----- Election RPCs -----
+
+  initElectionPollingStations() {
+    return from(
+      this.supabase.rpc('init_election_polling_stations')
+    ).pipe(map(this.unwrapResponse));
+  }
+
+  initElectionVoters() {
+    return from(
+      this.supabase.rpc('init_election_voters')
+    ).pipe(map(this.unwrapResponse));
+  }
+
+  registerVote(voterId: string, party: string, method: string = 'online') {
+    return from(
+      this.supabase.rpc('register_vote', {
+        p_voter_id: voterId,
+        p_party: party,
+        p_method: method
+      })
+    ).pipe(map(this.unwrapResponse));
+  }
+
+  verifyVoteBySms(smsCode: string, voterId?: string) {
+    return from(
+      this.supabase.rpc('verify_vote_by_sms', {
+        p_sms_code: smsCode,
+        p_voter_id: voterId || null
+      })
+    ).pipe(map(this.unwrapResponse));
+  }
+
+  sendFirstSms() {
+    return from(
+      this.supabase.rpc('send_first_sms')
+    ).pipe(map(this.unwrapResponse));
+  }
+
+  downloadBlockchainChain() {
+    return from(
+      this.supabase.rpc('download_blockchain_chain')
+    ).pipe(map(this.unwrapResponse));
+  }
+
+  deleteVote(voterId: string) {
+    return from(
+      this.supabase.rpc('delete_vote', {
+        p_voter_id: voterId
+      })
+    ).pipe(map(this.unwrapResponse));
+  }
+
+  sendSecondSms() {
+    return from(
+      this.supabase.rpc('send_second_sms')
+    ).pipe(map(this.unwrapResponse));
+  }
+
+  performExternalAudit(auditorName: string) {
+    return from(
+      this.supabase.rpc('perform_external_audit', {
+        p_auditor_name: auditorName
+      })
+    ).pipe(map(this.unwrapResponse));
+  }
+
+  getPartialResults() {
+    return from(
+      this.supabase.rpc('get_partial_results')
+    ).pipe(map(this.unwrapResponse));
+  }
+
+  // ----- Election Queries -----
+
+  getPollingStations() {
+    return from(
+      this.supabase
+        .from('election_polling_stations')
+        .select('*')
+        .order('name')
+    ).pipe(
+      map((response) => {
+        if (response.error) throw new Error(response.error.message);
+        return response.data ?? [];
+      })
+    );
+  }
+
+  getVoters(filters?: { nombre?: string; dni?: string }) {
+    let query = this.supabase
+      .from('election_voters')
+      .select('*, election_polling_stations(*)')
+      .order('nombre');
+    
+    if (filters?.nombre) {
+      query = query.ilike('nombre', `%${filters.nombre}%`);
+    }
+    if (filters?.dni) {
+      query = query.eq('dni', filters.dni);
+    }
+    
+    return from(query).pipe(
+      map((response) => {
+        if (response.error) throw new Error(response.error.message);
+        return response.data ?? [];
+      })
+    );
+  }
+
+  getVoterById(id: string) {
+    return from(
+      this.supabase
+        .from('election_voters')
+        .select('*, election_polling_stations(*)')
+        .eq('id', id)
+        .maybeSingle()
+    ).pipe(
+      map((response) => {
+        if (response.error) throw new Error(response.error.message);
+        return response.data;
+      })
+    );
+  }
+
+  getElectionAudits() {
+    return from(
+      this.supabase
+        .from('election_audits')
+        .select('*')
+        .order('created_at', { ascending: false })
+    ).pipe(
+      map((response) => {
+        if (response.error) throw new Error(response.error.message);
+        return response.data ?? [];
+      })
+    );
+  }
+
+  createElectionVoter(nombre: string, apellido: string, dni: string, telefono: string, direccion: string, pollingStationId?: string) {
+    return from(
+      this.supabase.rpc('create_election_voter', {
+        p_nombre: nombre,
+        p_apellido: apellido,
+        p_dni: dni,
+        p_telefono: telefono,
+        p_direccion: direccion,
+        p_polling_station_id: pollingStationId || null
+      })
+    ).pipe(map(this.unwrapResponse));
+  }
+
+  createVoterRandom() {
+    return from(
+      this.supabase.rpc('create_voter_random')
+    ).pipe(map(this.unwrapResponse));
+  }
+
+  simulateIndividualSms(voterId: string) {
+    return from(
+      this.supabase.rpc('simulate_individual_sms', {
+        p_voter_id: voterId
+      })
+    ).pipe(map(this.unwrapResponse));
+  }
+
+  sendSmsPhase3(voterId: string) {
+    return from(
+      this.supabase.rpc('send_sms_phase3', {
+        p_voter_id: voterId
+      })
+    ).pipe(map(this.unwrapResponse));
+  }
+
+  verifyIndividualResult(voterId: string, isCorrect: boolean) {
+    return from(
+      this.supabase.rpc('verify_individual_result', {
+        p_voter_id: voterId,
+        p_is_correct: isCorrect
+      })
+    ).pipe(map(this.unwrapResponse));
+  }
+
+  performSecondAudit() {
+    return from(
+      this.supabase.rpc('perform_second_audit')
+    ).pipe(map(this.unwrapResponse));
+  }
+
+  assignRandomVotes() {
+    return from(
+      this.supabase.rpc('assign_random_votes')
+    ).pipe(map(this.unwrapResponse));
+  }
+
+  simulateSmsSend(voterId: string) {
+    return from(
+      this.supabase.rpc('simulate_sms_send', {
+        p_voter_id: voterId
+      })
+    ).pipe(map(this.unwrapResponse));
+  }
+
+  getTotalResults() {
+    return from(
+      this.supabase.rpc('get_total_results')
+    ).pipe(map(this.unwrapResponse));
+  }
+
+  getFinalResults() {
+    return from(
+      this.supabase.rpc('get_final_results')
+    ).pipe(map(this.unwrapResponse));
+  }
 }
 

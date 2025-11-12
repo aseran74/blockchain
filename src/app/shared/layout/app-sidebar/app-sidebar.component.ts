@@ -50,6 +50,8 @@ export class AppSidebarComponent {
         { name: "Parámetros", path: "/parameters" },
         { name: "Wallet Votalia", path: "/wallets" },
         { name: "Simulación Solar", path: "/solar-simulation" },
+        { name: "Simulador Notaría", path: "/notary-simulation" },
+        { name: "Simulador Elecciones", path: "/election-simulation" },
       ],
     },
     {

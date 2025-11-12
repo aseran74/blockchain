@@ -857,6 +857,197 @@ export interface Database {
         };
         Relationships: [];
       };
+      election_polling_stations: {
+        Row: {
+          id: string;
+          name: string;
+          address: string;
+          city: string;
+          latitude: number;
+          longitude: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          address: string;
+          city: string;
+          latitude: number;
+          longitude: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          address?: string;
+          city?: string;
+          latitude?: number;
+          longitude?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      election_voters: {
+        Row: {
+          id: string;
+          nombre: string;
+          apellido: string;
+          dni: string;
+          telefono: string;
+          direccion: string;
+          polling_station_id: string | null;
+          latitude: number | null;
+          longitude: number | null;
+          registered: boolean;
+          voted: boolean;
+          vote_party: 'PSOE' | 'PP' | 'Podemos' | 'Vox' | 'PnV' | null;
+          vote_method: 'online' | 'presential' | null;
+          sms_code: string;
+          vote_hash: string | null;
+          block_hash: string | null;
+          block_number: number | null;
+          status: 'registered' | 'voted' | 'verified' | 'counted' | 'audited' | 'challenged';
+          user_verified: boolean;
+          first_sms_sent: boolean;
+          chain_downloaded: boolean;
+          second_sms_sent: boolean;
+          challenged: boolean;
+          audit_match: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          nombre: string;
+          apellido: string;
+          dni: string;
+          telefono: string;
+          direccion: string;
+          polling_station_id?: string | null;
+          latitude?: number | null;
+          longitude?: number | null;
+          registered?: boolean;
+          voted?: boolean;
+          vote_party?: 'PSOE' | 'PP' | 'Podemos' | 'Vox' | 'PnV' | null;
+          vote_method?: 'online' | 'presential' | null;
+          sms_code?: string;
+          vote_hash?: string | null;
+          block_hash?: string | null;
+          block_number?: number | null;
+          status?: 'registered' | 'voted' | 'verified' | 'counted' | 'audited' | 'challenged';
+          user_verified?: boolean;
+          first_sms_sent?: boolean;
+          chain_downloaded?: boolean;
+          second_sms_sent?: boolean;
+          challenged?: boolean;
+          audit_match?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          nombre?: string;
+          apellido?: string;
+          dni?: string;
+          telefono?: string;
+          direccion?: string;
+          polling_station_id?: string | null;
+          latitude?: number | null;
+          longitude?: number | null;
+          registered?: boolean;
+          voted?: boolean;
+          vote_party?: 'PSOE' | 'PP' | 'Podemos' | 'Vox' | 'PnV' | null;
+          vote_method?: 'online' | 'presential' | null;
+          sms_code?: string;
+          vote_hash?: string | null;
+          block_hash?: string | null;
+          block_number?: number | null;
+          status?: 'registered' | 'voted' | 'verified' | 'counted' | 'audited' | 'challenged';
+          user_verified?: boolean;
+          first_sms_sent?: boolean;
+          chain_downloaded?: boolean;
+          second_sms_sent?: boolean;
+          challenged?: boolean;
+          audit_match?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'election_voters_polling_station_id_fkey';
+            columns: ['polling_station_id'];
+            isOneToOne: false;
+            referencedRelation: 'election_polling_stations';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
+      election_partial_results: {
+        Row: {
+          id: string;
+          phase: number;
+          party: 'PSOE' | 'PP' | 'Podemos' | 'Vox' | 'PnV';
+          votes: number;
+          percentage: number | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          phase: number;
+          party: 'PSOE' | 'PP' | 'Podemos' | 'Vox' | 'PnV';
+          votes?: number;
+          percentage?: number | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          phase?: number;
+          party?: 'PSOE' | 'PP' | 'Podemos' | 'Vox' | 'PnV';
+          votes?: number;
+          percentage?: number | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      election_audits: {
+        Row: {
+          id: string;
+          auditor_name: string;
+          total_votes_checked: number;
+          matches: number;
+          mismatches: number;
+          match_percentage: number | null;
+          status: 'pending' | 'completed' | 'failed';
+          created_at: string;
+          completed_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          auditor_name: string;
+          total_votes_checked?: number;
+          matches?: number;
+          mismatches?: number;
+          match_percentage?: number | null;
+          status?: 'pending' | 'completed' | 'failed';
+          created_at?: string;
+          completed_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          auditor_name?: string;
+          total_votes_checked?: number;
+          matches?: number;
+          mismatches?: number;
+          match_percentage?: number | null;
+          status?: 'pending' | 'completed' | 'failed';
+          created_at?: string;
+          completed_at?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Views: {};
     Functions: {
@@ -892,7 +1083,103 @@ export interface Database {
         Args: { _from: string; _to: string; _amount: number; _memo?: string | null };
         Returns: void;
       };
-    };
+      init_election_polling_stations: {
+        Args: Record<string, never>;
+        Returns: void;
+      };
+      init_election_voters: {
+        Args: Record<string, never>;
+        Returns: void;
+      };
+      register_vote: {
+        Args: { p_voter_id: string; p_party: string; p_method?: string };
+        Returns: { success: boolean; vote_hash: string; voter_id: string };
+      };
+      send_sms_phase3: {
+        Args: { p_voter_id: string };
+        Returns: {
+          success: boolean;
+          sms_sent: boolean;
+          sms_code: string;
+          encryption_key: string;
+          encrypted_data: string;
+          sms_message: string;
+          voter: {
+            id: string;
+            nombre: string;
+            apellido: string;
+            telefono: string;
+            vote_party: string;
+            vote_hash: string;
+            vote_method: string;
+          };
+        };
+      };
+      verify_vote_by_sms: {
+        Args: { p_sms_code: string; p_voter_id?: string | null };
+        Returns: { success: boolean; voter?: { id: string; nombre: string; apellido: string; vote_party: string; vote_hash: string; vote_method: string }; error?: string };
+      };
+      send_first_sms: {
+        Args: Record<string, never>;
+        Returns: { success: boolean; sms_sent: number };
+      };
+      download_blockchain_chain: {
+        Args: Record<string, never>;
+        Returns: { success: boolean; chain_downloaded: number; block_number: number };
+      };
+      send_second_sms: {
+        Args: Record<string, never>;
+        Returns: { success: boolean; sms_sent: number };
+      };
+      perform_external_audit: {
+        Args: { p_auditor_name: string };
+        Returns: { success: boolean; audit_id: string; total_votes: number; matches: number; match_percentage: number };
+      };
+      get_partial_results: {
+        Args: Record<string, never>;
+        Returns: Array<{ party: string; votes: number; percentage: number }>;
+      };
+      create_election_voter: {
+        Args: { p_nombre: string; p_apellido: string; p_dni: string; p_telefono: string; p_direccion: string; p_polling_station_id?: string | null };
+        Returns: { success: boolean; voter_id: string };
+      };
+      assign_random_votes: {
+        Args: Record<string, never>;
+        Returns: { success: boolean; votes_assigned: number };
+      };
+      simulate_sms_send: {
+        Args: { p_voter_id: string };
+        Returns: { success: boolean; sms_sent: boolean; sms_code: string; voter: { id: string; nombre: string; apellido: string; telefono: string; vote_party: string; vote_hash: string }; error?: string };
+      };
+      get_total_results: {
+        Args: Record<string, never>;
+        Returns: Array<{ party: string; votes: number; percentage: number }>;
+      };
+          get_final_results: {
+            Args: Record<string, never>;
+            Returns: Array<{ party: string; votes: number; percentage: number; audited_votes: number }>;
+          };
+          create_voter_random: {
+            Args: Record<string, never>;
+            Returns: { success: boolean; voter_id: string; nombre: string; apellido: string; dni: string; telefono: string; direccion: string };
+          };
+          simulate_individual_sms: {
+            Args: { p_voter_id: string };
+            Returns: { success: boolean; sms_sent: boolean; sms_code: string; voter: { id: string; nombre: string; apellido: string; telefono: string; vote_party: string; vote_hash: string }; is_correct: boolean; message: string; error?: string };
+          };
+          verify_individual_result: {
+            Args: { p_voter_id: string; p_is_correct: boolean };
+            Returns: { success: boolean; verified: boolean; is_correct: boolean; status: string; error?: string };
+          };
+          perform_second_audit: {
+            Args: Record<string, never>;
+            Returns: { success: boolean; total_votes: number; matches: number; match_percentage: number; sms_sent: number };
+          };
+          delete_vote: {
+            Args: { p_voter_id: string };
+            Returns: { success: boolean; message: string; error?: string };
+          };
+        };
     Enums: {
       pnv_actor_status: 'active' | 'inactive' | 'banned';
       pnv_block_group_status: 'pending' | 'voting' | 'confirmed' | 'timeout';

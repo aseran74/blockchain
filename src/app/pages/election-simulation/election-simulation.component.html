@@ -1,0 +1,575 @@
+<section class="space-y-6 p-6">
+  <header class="space-y-2">
+    <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
+      Simulador de Elecciones - Fases 1-5
+    </h1>
+    <p class="text-sm text-gray-500 dark:text-gray-400">
+      Selecciona un votante, registra su voto, envía SMS y obtén resultados totales.
+    </p>
+  </header>
+
+  @if (error()) {
+    <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-800 dark:bg-red-900/20">
+      {{ error() }}
+    </div>
+  }
+
+  @if (totalVoters() === 0) {
+    <div class="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="mb-1 text-lg font-semibold text-gray-900 dark:text-white">Inicializar Datos</h2>
+          <p class="text-sm text-gray-500 dark:text-gray-400">
+            No hay votantes cargados. Haz clic en el botón para inicializar 100 votantes y 10 colegios electorales.
+          </p>
+        </div>
+        <button
+          (click)="initializeBaseData()"
+          [disabled]="loading()"
+          class="rounded-lg bg-blue-500 px-6 py-2 font-semibold text-white transition hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {{ loading() ? 'Inicializando...' : 'Inicializar Datos' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  <div class="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+    <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Fase 1: Seleccionar o Crear Votante</h2>
+    
+    <div class="space-y-4">
+      <div class="flex gap-2">
+        <input
+          type="text"
+          placeholder="Buscar por nombre, apellido o DNI..."
+          [value]="searchName()"
+          (input)="searchName.set($any($event.target).value)"
+          class="flex-1 rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+        />
+        <button
+          (click)="toggleCreateForm()"
+          class="rounded-lg bg-emerald-500 px-4 py-2 font-semibold text-white transition hover:bg-emerald-600"
+        >
+          {{ showCreateForm() ? 'Cancelar' : 'Crear Nuevo' }}
+        </button>
+      </div>
+
+      @if (showCreateForm()) {
+        <div class="rounded-lg border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-900/20">
+          <h3 class="mb-3 font-semibold text-gray-900 dark:text-white">Crear Nuevo Votante</h3>
+          
+          <div class="mb-3">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                [checked]="useRandomData()"
+                (change)="useRandomData.set($any($event.target).checked)"
+                class="rounded"
+              />
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Usar datos aleatorios (rápido)</span>
+            </label>
+          </div>
+          
+          @if (useRandomData()) {
+            <button
+              (click)="createVoterWithRandomData()"
+              [disabled]="loading()"
+              class="w-full rounded-lg bg-emerald-500 px-6 py-3 font-semibold text-white transition hover:bg-emerald-600 disabled:opacity-50"
+            >
+              {{ loading() ? 'Creando...' : 'Crear con Datos Aleatorios' }}
+            </button>
+          }
+          
+          @if (!useRandomData()) {
+            <div class="grid gap-3 md:grid-cols-2">
+              <input
+                type="text"
+                placeholder="Nombre *"
+                [value]="newVoterNombre()"
+                (input)="newVoterNombre.set($any($event.target).value)"
+                class="rounded-lg border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+              />
+              <input
+                type="text"
+                placeholder="Apellido *"
+                [value]="newVoterApellido()"
+                (input)="newVoterApellido.set($any($event.target).value)"
+                class="rounded-lg border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+              />
+              <input
+                type="text"
+                placeholder="DNI *"
+                [value]="newVoterDni()"
+                (input)="newVoterDni.set($any($event.target).value)"
+                class="rounded-lg border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+              />
+              <input
+                type="text"
+                placeholder="Teléfono *"
+                [value]="newVoterTelefono()"
+                (input)="newVoterTelefono.set($any($event.target).value)"
+                class="rounded-lg border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+              />
+              <input
+                type="text"
+                placeholder="Dirección *"
+                [value]="newVoterDireccion()"
+                (input)="newVoterDireccion.set($any($event.target).value)"
+                class="md:col-span-2 rounded-lg border border-gray-300 px-3 py-2 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+              />
+            </div>
+            <button
+              (click)="createVoterManual()"
+              [disabled]="loading()"
+              class="mt-3 w-full rounded-lg bg-emerald-500 px-6 py-3 font-semibold text-white transition hover:bg-emerald-600 disabled:opacity-50"
+            >
+              {{ loading() ? 'Creando...' : 'Crear Votante' }}
+            </button>
+          }
+        </div>
+      }
+
+      @if (!showCreateForm()) {
+        <div class="space-y-2">
+          <div class="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+            <span>
+              @if (searchName().trim()) {
+                Buscando: "{{ searchName() }}" - {{ filteredVoters().length }} resultado(s)
+              }
+              @if (!searchName().trim()) {
+                Total: {{ totalVoters() }} votantes
+              }
+            </span>
+            @if (selectedVoterId()) {
+              <span class="font-semibold text-emerald-600 dark:text-emerald-400">
+                ✓ Votante seleccionado
+              </span>
+            }
+          </div>
+          
+          <div class="max-h-96 overflow-y-auto rounded-lg border border-gray-200 dark:border-gray-700">
+            @if (filteredVoters().length > 0) {
+              @for (voter of filteredVoters(); track voter.id) {
+                <div class="flex items-start gap-3 border-b border-gray-200 p-3 transition hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                     [class.bg-blue-50]="selectedVoterId() === voter.id">
+                  <div class="flex-1">
+                    <div class="font-semibold text-gray-900 dark:text-white">
+                      {{ voter.nombre }} {{ voter.apellido }}
+                    </div>
+                    <div class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                      DNI: {{ voter.dni }} | Tel: {{ voter.telefono }}
+                    </div>
+                    <div class="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                      {{ voter.direccion }}
+                    </div>
+                    @if (voter.voted) {
+                      <div class="mt-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                        ✓ Ya votó: {{ voter.vote_party }}
+                      </div>
+                    }
+                  </div>
+                  <div class="flex gap-2">
+                    <button
+                      (click)="selectVoter(voter.id); $event.stopPropagation()"
+                      [disabled]="loading()"
+                      [class.bg-blue-500]="selectedVoterId() === voter.id"
+                      [class.bg-blue-400]="selectedVoterId() !== voter.id"
+                      class="rounded-lg px-3 py-1 text-xs font-semibold text-white transition hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {{ selectedVoterId() === voter.id ? '✓ Seleccionado' : 'Seleccionar' }}
+                    </button>
+                    @if (voter.voted) {
+                      <button
+                        (click)="deleteVote(voter.id, $event)"
+                        [disabled]="loading()"
+                        class="rounded-lg bg-red-500 px-3 py-1 text-xs font-semibold text-white transition hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Borrar
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+            }
+            @if (filteredVoters().length === 0) {
+              <div class="p-4 text-center text-sm text-gray-600 dark:text-gray-400">
+                @if (searchName().trim()) {
+                  No se encontraron votantes con "{{ searchName() }}"
+                }
+                @if (!searchName().trim()) {
+                  No hay votantes disponibles. Inicializa los datos primero.
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (selectedVoter(); as voter) {
+        <div class="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+          <div class="mb-2 font-semibold text-blue-900 dark:text-blue-200">Votante Seleccionado:</div>
+          <div class="space-y-1 text-sm">
+            <div><strong>Nombre:</strong> {{ voter.nombre }} {{ voter.apellido }}</div>
+            <div><strong>DNI:</strong> {{ voter.dni }}</div>
+            <div><strong>Teléfono:</strong> {{ voter.telefono }}</div>
+            <div><strong>Dirección:</strong> {{ voter.direccion }}</div>
+            @if (voter.election_polling_stations) {
+              <div><strong>Colegio Electoral:</strong> {{ voter.election_polling_stations.name }} ({{ voter.election_polling_stations.city }})</div>
+            }
+            @if (voter.voted) {
+              <div class="mt-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                ⚠️ Este votante ya ha votado: {{ voter.vote_party }}
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Fase 2: Registrar Voto -->
+  @if (selectedVoter(); as voter) {
+    @if (!voter.voted) {
+      <div class="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+        <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Fase 2: Registrar Voto</h2>
+        <p class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+          Selecciona el partido por el que desea votar {{ voter.nombre }} {{ voter.apellido }}:
+        </p>
+        
+        <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+          @for (party of parties; track party) {
+            <button
+              (click)="registerVote(party, 'online')"
+              [disabled]="loading()"
+              class="rounded-lg border-2 border-gray-300 bg-white px-6 py-4 text-center font-semibold transition hover:border-blue-500 hover:bg-blue-50 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:border-blue-400 dark:hover:bg-blue-900/20 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {{ party }}
+            </button>
+          }
+        </div>
+        
+        <div class="mt-4 text-xs text-gray-500 dark:text-gray-400">
+          Método de votación: Online (simulado)
+        </div>
+      </div>
+    }
+  }
+
+  <!-- Fase 3: Enviar SMS Simulado -->
+  @if (selectedVoter(); as voter) {
+    @if (voter.voted) {
+      <div class="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+        <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Fase 3: Enviar SMS Simulado</h2>
+        <p class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+          Envía un SMS simulado a {{ voter.nombre }} {{ voter.apellido }} con los datos del voto encriptados.
+        </p>
+        
+        @if (!smsData()) {
+          <button
+            (click)="sendSmsPhase3()"
+            [disabled]="loading()"
+            class="rounded-lg bg-purple-500 px-6 py-3 font-semibold text-white transition hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {{ loading() ? 'Enviando SMS...' : 'Enviar SMS Simulado' }}
+          </button>
+        }
+
+        @if (smsData(); as sms) {
+          <div class="mt-4 space-y-4 rounded-lg border border-purple-200 bg-purple-50 p-4 dark:border-purple-800 dark:bg-purple-900/20">
+            <div class="font-semibold text-purple-900 dark:text-purple-200">✓ SMS Enviado Exitosamente</div>
+            
+            <div class="space-y-2 text-sm">
+              <div class="rounded bg-white p-3 dark:bg-gray-800">
+                <div class="mb-2 font-semibold text-gray-900 dark:text-white">Mensaje SMS:</div>
+                <div class="text-gray-700 dark:text-gray-300">{{ sms.sms_message }}</div>
+              </div>
+
+              <div class="grid gap-3 md:grid-cols-2">
+                <div class="rounded bg-white p-3 dark:bg-gray-800">
+                  <div class="mb-1 text-xs font-semibold text-gray-600 dark:text-gray-400">Código SMS:</div>
+                  <div class="font-mono text-lg font-bold text-gray-900 dark:text-white">{{ sms.sms_code }}</div>
+                </div>
+                
+                <div class="rounded bg-white p-3 dark:bg-gray-800">
+                  <div class="mb-1 text-xs font-semibold text-gray-600 dark:text-gray-400">Clave Encriptación:</div>
+                  <div class="font-mono text-lg font-bold text-gray-900 dark:text-white">{{ sms.encryption_key }}</div>
+                </div>
+              </div>
+
+              <div class="rounded bg-white p-3 dark:bg-gray-800">
+                <div class="mb-2 text-xs font-semibold text-gray-600 dark:text-gray-400">Datos Encriptados (SHA-256):</div>
+                <div class="break-all font-mono text-xs text-gray-700 dark:text-gray-300">{{ sms.encrypted_data }}</div>
+              </div>
+
+              <div class="rounded bg-white p-3 dark:bg-gray-800">
+                <div class="mb-2 text-xs font-semibold text-gray-600 dark:text-gray-400">Datos del Voto Registrado:</div>
+                <div class="space-y-1 text-xs text-gray-700 dark:text-gray-300">
+                  <div><strong>Partido:</strong> {{ sms.voter?.vote_party }}</div>
+                  <div><strong>Método:</strong> {{ sms.voter?.vote_method === 'online' ? 'Online' : 'Presencial' }}</div>
+                  <div><strong>Hash del Voto:</strong> <span class="font-mono">{{ sms.voter?.vote_hash }}</span></div>
+                  <div><strong>Teléfono:</strong> {{ sms.voter?.telefono }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Verificación del Usuario -->
+        @if (smsData() && !verificationResult()) {
+          <div class="mt-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
+            <div class="mb-3 font-semibold text-yellow-900 dark:text-yellow-200">Verificación del Usuario:</div>
+            <p class="mb-3 text-sm text-yellow-800 dark:text-yellow-300">
+              Por favor, verifica si el voto registrado es correcto según el SMS recibido:
+            </p>
+            <div class="flex gap-3">
+              <button
+                (click)="verifyVoteResult(true)"
+                [disabled]="loading()"
+                class="flex-1 rounded-lg bg-green-500 px-4 py-2 font-semibold text-white transition hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                ✓ Correcto
+              </button>
+              <button
+                (click)="verifyVoteResult(false)"
+                [disabled]="loading()"
+                class="flex-1 rounded-lg bg-red-500 px-4 py-2 font-semibold text-white transition hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                ✗ Incorrecto
+              </button>
+            </div>
+          </div>
+        }
+
+        @if (verificationResult(); as verification) {
+          <div [class]="getVerificationClasses(verification.is_correct)">
+            <div [class]="getVerificationTextClasses(verification.is_correct)">
+              @if (verification.is_correct) {
+                ✓ Voto Verificado como CORRECTO
+              }
+              @if (!verification.is_correct) {
+                ⚠️ Voto Marcado como INCORRECTO - Desafío Registrado
+              }
+            </div>
+            <div [class]="getVerificationStatusClasses(verification.is_correct)">
+              Estado: {{ verification.status }}
+            </div>
+            @if (verification.message) {
+              <div [class]="getVerificationMessageClasses(verification.is_correct)">
+                {{ verification.message }}
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <!-- Fase 4: Asignar Votos Aleatorios y Resultados Totales -->
+  <div class="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+    <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Fase 4: Resultados Totales</h2>
+    <p class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+      Asigna votos aleatorios a los votantes que aún no han votado y obtén los resultados totales de la elección.
+    </p>
+    
+    @if (!totalResults()) {
+      <button
+        (click)="assignRandomVotesAndGetResults()"
+        [disabled]="loading()"
+        class="rounded-lg bg-indigo-500 px-6 py-3 font-semibold text-white transition hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {{ loading() ? 'Asignando votos y calculando resultados...' : 'Asignar Votos Aleatorios y Mostrar Resultados' }}
+      </button>
+    }
+
+    @if (randomVotesAssigned() !== null) {
+      <div class="mt-4 rounded-lg border border-indigo-200 bg-indigo-50 p-4 dark:border-indigo-800 dark:bg-indigo-900/20">
+        <div class="font-semibold text-indigo-900 dark:text-indigo-200">
+          ✓ Votos Aleatorios Asignados: {{ randomVotesAssigned() }} votantes
+        </div>
+      </div>
+    }
+
+    @if (totalResults(); as results) {
+      <div class="mt-4 space-y-4">
+        <!-- Resumen por Partido -->
+        <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
+          <div class="mb-3 text-lg font-semibold text-gray-900 dark:text-white">Resumen por Partido</div>
+          
+          @if (results.length > 0) {
+            @for (result of results; track result.party) {
+              <div class="mb-3 rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
+                <div class="mb-2 flex items-center justify-between">
+                  <div class="text-lg font-semibold text-gray-900 dark:text-white">{{ result.party }}</div>
+                  <div class="text-lg font-bold text-indigo-600 dark:text-indigo-400">{{ result.votes }} votos</div>
+                </div>
+                <div class="mb-2 h-4 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                  <div class="h-full rounded-full bg-indigo-500 transition-all" [style.width.%]="result.percentage"></div>
+                </div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">{{ result.percentage }}% del total</div>
+              </div>
+            }
+            
+            <div class="mt-4 rounded-lg border border-indigo-200 bg-indigo-50 p-3 dark:border-indigo-800 dark:bg-indigo-900/20">
+              <div class="text-sm font-semibold text-indigo-900 dark:text-indigo-200">
+                Total de Votos: {{ totalVotesCount() }}
+              </div>
+            </div>
+          } @else {
+            <div class="text-center text-sm text-gray-600 dark:text-gray-400">
+              No hay resultados disponibles aún
+            </div>
+          }
+        </div>
+
+        <!-- Detalle de Votantes por Partido -->
+        @if (partiesWithVoters().length > 0) {
+          <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
+            <div class="mb-3 text-lg font-semibold text-gray-900 dark:text-white">Detalle de Votantes por Partido</div>
+            
+            @for (party of partiesWithVoters(); track party) {
+              @if (votersByParty()[party] && votersByParty()[party].length > 0) {
+                <div class="mb-4 rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
+                  <div class="mb-3 flex items-center justify-between border-b border-gray-200 pb-2 dark:border-gray-700">
+                    <div class="text-lg font-semibold text-gray-900 dark:text-white">{{ party }}</div>
+                    <div class="text-sm font-semibold text-indigo-600 dark:text-indigo-400">
+                      {{ votersByParty()[party].length }} votante(s)
+                    </div>
+                  </div>
+                  
+                  <div class="max-h-64 space-y-2 overflow-y-auto">
+                    @for (voter of votersByParty()[party]; track voter.id) {
+                      <div class="flex items-start justify-between rounded border border-gray-100 bg-gray-50 p-2 dark:border-gray-700 dark:bg-gray-800">
+                        <div class="flex-1">
+                          <div class="text-sm font-medium text-gray-900 dark:text-white">
+                            {{ voter.nombre }} {{ voter.apellido }}
+                          </div>
+                          <div class="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                            DNI: {{ voter.dni }} | Tel: {{ voter.telefono }}
+                          </div>
+                          <div class="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                            Método: {{ voter.vote_method === 'online' ? 'Online' : 'Presencial' }}
+                            @if (voter.vote_hash) {
+                              | Hash: <span class="font-mono">{{ voter.vote_hash.substring(0, 16) }}...</span>
+                            }
+                          </div>
+                        </div>
+                        <div class="ml-2 text-xs text-gray-500 dark:text-gray-500">
+                          @if (voter.first_sms_sent) {
+                            <span class="text-emerald-600 dark:text-emerald-400">✓ SMS</span>
+                          }
+                          @if (voter.user_verified) {
+                            <span class="ml-1 text-blue-600 dark:text-blue-400">✓ Verificado</span>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Fase 5: Descargar Cadena de Bloques -->
+  <div class="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+    <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Fase 5: Descargar Cadena de Bloques</h2>
+    <p class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+      Descarga la cadena de bloques completa con todos los votos registrados y verifica la integridad de los datos.
+    </p>
+    
+    @if (!chainDownloadResult()) {
+      <button
+        (click)="downloadBlockchainChain()"
+        [disabled]="loading()"
+        class="rounded-lg bg-teal-500 px-6 py-3 font-semibold text-white transition hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {{ loading() ? 'Descargando cadena...' : 'Descargar Cadena de Bloques' }}
+      </button>
+    }
+
+    @if (chainDownloadResult(); as download) {
+      <div class="mt-4 space-y-4 rounded-lg border border-teal-200 bg-teal-50 p-4 dark:border-teal-800 dark:bg-teal-900/20">
+        <div class="font-semibold text-teal-900 dark:text-teal-200">
+          ✓ Cadena de Bloques Descargada Exitosamente
+        </div>
+        
+        <div class="grid gap-3 md:grid-cols-3">
+          <div class="rounded bg-white p-3 dark:bg-gray-800">
+            <div class="mb-1 text-xs font-semibold text-gray-600 dark:text-gray-400">Votos Procesados:</div>
+            <div class="text-lg font-bold text-teal-600 dark:text-teal-400">{{ download.chain_downloaded }}</div>
+          </div>
+          
+          <div class="rounded bg-white p-3 dark:bg-gray-800">
+            <div class="mb-1 text-xs font-semibold text-gray-600 dark:text-gray-400">Número de Bloque:</div>
+            <div class="text-lg font-bold text-teal-600 dark:text-teal-400">{{ download.block_number }}</div>
+          </div>
+          
+          <div class="rounded bg-white p-3 dark:bg-gray-800">
+            <div class="mb-1 text-xs font-semibold text-gray-600 dark:text-gray-400">Fecha de Descarga:</div>
+            <div class="text-sm font-semibold text-teal-600 dark:text-teal-400">
+              @if (download.download_date) {
+                {{ download.download_date | date:'dd/MM/yyyy HH:mm:ss' }}
+              }
+              @if (!download.download_date) {
+                @if (voters().length > 0) {
+                  @for (voter of voters(); track voter.id) {
+                    @if (voter.chain_downloaded && voter.updated_at) {
+                      {{ voter.updated_at | date:'dd/MM/yyyy HH:mm:ss' }}
+                      @break;
+                    }
+                  }
+                }
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Botón para descargar archivo completo -->
+        <div class="mt-4 flex justify-center">
+          <button
+            (click)="downloadVotersFile()"
+            class="rounded-lg bg-indigo-500 px-6 py-3 font-semibold text-white transition hover:bg-indigo-600"
+          >
+            📥 Descargar Archivo Completo ({{ totalVoters() }} votantes)
+          </button>
+        </div>
+
+        <div class="mt-4 rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+          <div class="mb-2 text-sm font-semibold text-gray-900 dark:text-white">Votantes con Cadena Descargada:</div>
+          <div class="max-h-64 space-y-2 overflow-y-auto">
+            @for (voter of voters(); track voter.id) {
+              @if (voter.chain_downloaded) {
+                <div class="flex items-start justify-between rounded border border-gray-100 bg-gray-50 p-2 dark:border-gray-700 dark:bg-gray-900">
+                  <div class="flex-1">
+                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                      {{ voter.nombre }} {{ voter.apellido }}
+                    </div>
+                    <div class="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                      DNI: {{ voter.dni }} | Partido: {{ voter.vote_party }}
+                    </div>
+                    @if (voter.block_hash) {
+                      <div class="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                        Hash Bloque: <span class="font-mono">{{ voter.block_hash.substring(0, 16) }}...</span>
+                      </div>
+                    }
+                    @if (voter.block_number) {
+                      <div class="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                        Bloque #{{ voter.block_number }}
+                      </div>
+                    }
+                  </div>
+                  <div class="ml-2 text-xs text-teal-600 dark:text-teal-400">
+                    ✓ Descargado
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</section>

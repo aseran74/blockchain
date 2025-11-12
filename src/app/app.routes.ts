@@ -11,6 +11,8 @@ import { GlobalTpsComponent } from './pages/insights/global-tps/global-tps.compo
 import { WalletsComponent } from './pages/wallets/wallets.component';
 import { HomeComponent } from './pages/home/home.component';
 import { SolarSimulationComponent } from './pages/solar-simulation/solar-simulation.component';
+import { NotarySimulationComponent } from './pages/notary-simulation/notary-simulation.component';
+import { ElectionSimulationComponent } from './pages/election-simulation/election-simulation.component';
 
 export const routes: Routes = [
   {
@@ -67,6 +69,16 @@ export const routes: Routes = [
         path: 'solar-simulation',
         component: SolarSimulationComponent,
         title: 'Simulación Paneles Solares | Votalia',
+      },
+      {
+        path: 'notary-simulation',
+        component: NotarySimulationComponent,
+        title: 'Simulador Notaría y Registro | Votalia',
+      },
+      {
+        path: 'election-simulation',
+        component: ElectionSimulationComponent,
+        title: 'Simulador Elecciones | Votalia',
       },
       {
         path: '',

@@ -72,6 +72,11 @@
                 <div class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                   ID: {{ panel.id }} | Producción: {{ formatNumber(panel.production) }} kWh
                 </div>
+                @if (panel.blockHash && panel.blockNumber) {
+                  <div class="mt-1 text-xs text-blue-600 dark:text-blue-400 font-mono">
+                    📋 Hash: {{ formatHash(panel.blockHash) }} | Bloque: #{{ panel.blockNumber }}
+                  </div>
+                }
                 @if (panel.leaderId && panel.distanceToNearestLeader !== undefined) {
                   <div class="mt-1 text-xs text-gray-500 dark:text-gray-500">
                     Detectado por líder {{ panel.leaderId }} a {{ formatNumber(panel.distanceToNearestLeader) }} km

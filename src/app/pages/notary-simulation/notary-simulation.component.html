@@ -1,0 +1,211 @@
+<section class="space-y-6 p-6">
+  <header class="space-y-2">
+    <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
+      Simulador Notaría y Registro de la Propiedad (PPoV)
+    </h1>
+    <p class="text-sm text-gray-500 dark:text-gray-400">
+      Sistema de verificación inmobiliaria distribuida con 500 inmuebles y 20 registros de la propiedad.
+      Los notarios verifican en tiempo real: Registro, Tipo de suelo, Metros, Propietarios, Cargas y Edificabilidad.
+    </p>
+  </header>
+
+  <!-- Métricas principales -->
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+      <div class="text-sm text-gray-500 dark:text-gray-400">Total Inmuebles</div>
+      <div class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">{{ totalProperties() }}</div>
+    </div>
+    <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+      <div class="text-sm text-gray-500 dark:text-gray-400">Registros de la Propiedad</div>
+      <div class="mt-1 text-2xl font-semibold text-emerald-600 dark:text-emerald-400">{{ registries().length }}</div>
+    </div>
+    <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+      <div class="text-sm text-gray-500 dark:text-gray-400">Inmuebles con Cargas</div>
+      <div class="mt-1 text-2xl font-semibold text-rose-600 dark:text-rose-400">{{ propertiesWithCharges().length }}</div>
+    </div>
+    <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+      <div class="text-sm text-gray-500 dark:text-gray-400">Inmuebles sin Discrepancias</div>
+      <div class="mt-1 text-2xl font-semibold text-emerald-600 dark:text-emerald-400">{{ propertiesWithoutDiscrepancies().length }}</div>
+    </div>
+  </div>
+
+  <!-- Mapa de España con Leaflet -->
+  <div class="rounded-xl border border-gray-200 bg-gray-50 p-6 dark:border-gray-800 dark:bg-gray-900">
+    <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Distribución Geográfica de Inmuebles</h2>
+    <div class="relative h-[600px] w-full overflow-hidden rounded-lg">
+      <div id="notary-map" class="h-full w-full"></div>
+      
+      <!-- Leyenda -->
+      <div class="absolute bottom-4 left-4 z-[1000] rounded-lg bg-white/95 px-4 py-2 text-xs shadow-lg dark:bg-gray-800/95">
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2">
+            <div class="h-3 w-3 rounded-full bg-emerald-500 border-2 border-emerald-700"></div>
+            <span>Registro</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="h-3 w-3 rounded-full bg-blue-500"></div>
+            <span>Sin Cargas</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="h-3 w-3 rounded-full bg-amber-500"></div>
+            <span>Con Discrepancias</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="h-3 w-3 rounded-full bg-rose-500"></div>
+            <span>Con Cargas</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de inmuebles con discrepancias (5 casos) -->
+  @if (propertiesWithDiscrepancies().length > 0) {
+    <div class="rounded-xl border border-amber-200 bg-amber-50 p-6 dark:border-amber-800 dark:bg-amber-900/20">
+      <h2 class="mb-4 text-lg font-semibold text-amber-900 dark:text-amber-200">
+        ⚠️ Discrepancias Detectadas: Notario vs Registro (5 casos)
+      </h2>
+      <p class="mb-4 text-sm text-amber-800 dark:text-amber-300">
+        Los siguientes inmuebles tienen discrepancias entre lo que el notario va a firmar y los datos reales del registro de la propiedad.
+      </p>
+      <div class="space-y-4">
+        @for (property of propertiesWithDiscrepancies(); track property.id) {
+          <div class="rounded-lg border-2 border-amber-400 bg-white p-5 dark:border-amber-600 dark:bg-gray-800">
+            <div class="mb-3">
+              <div class="font-semibold text-lg text-gray-900 dark:text-white">{{ property.address }}</div>
+              <div class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                {{ property.city }} | {{ property.propertyRegistry }}
+              </div>
+              @if (property.blockHash && property.blockNumber) {
+                <div class="mt-1 text-xs text-blue-600 dark:text-blue-400 font-mono">
+                  📋 Hash: {{ formatHash(property.blockHash) }} | Bloque: #{{ property.blockNumber }}
+                </div>
+              }
+            </div>
+            
+            <!-- Discrepancias -->
+            @if (property.discrepancies && property.discrepancies.length > 0) {
+              <div class="mt-4 space-y-3">
+                <div class="text-sm font-semibold text-amber-900 dark:text-amber-200 mb-2">
+                  Discrepancias encontradas:
+                </div>
+                @for (discrepancy of property.discrepancies; track discrepancy.field) {
+                  <div class="rounded-lg border border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-900/30">
+                    <div class="font-semibold text-amber-900 dark:text-amber-200 mb-2">
+                      {{ discrepancy.field }}
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <div class="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">📝 Notario va a firmar:</div>
+                        <div class="text-red-600 dark:text-red-400 font-medium">{{ discrepancy.notaryValue }}</div>
+                      </div>
+                      <div>
+                        <div class="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">✅ Registro real:</div>
+                        <div class="text-emerald-600 dark:text-emerald-400 font-medium">{{ discrepancy.registryValue }}</div>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+            
+            <!-- Datos completos del inmueble -->
+            <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div class="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2">Datos completos del inmueble:</div>
+              <div class="grid grid-cols-2 gap-2 text-xs text-gray-600 dark:text-gray-400">
+                <div><strong>Tipo de suelo:</strong> {{ property.soilType }}</div>
+                <div><strong>Metros:</strong> {{ formatNumber(property.area) }} m²</div>
+                <div><strong>Propietario(s):</strong> {{ property.owners.join(', ') }}</div>
+                <div><strong>Edificabilidad:</strong> {{ formatNumber(property.buildability) }} m²</div>
+                <div class="col-span-2">
+                  <strong>Cargas:</strong> {{ property.charges.length > 0 ? property.charges.join(', ') : 'Sin cargas' }}
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Lista de inmuebles con cargas -->
+  @if (propertiesWithCharges().length > 0) {
+    <div class="rounded-xl border border-rose-200 bg-rose-50 p-6 dark:border-rose-800 dark:bg-rose-900/20">
+      <h2 class="mb-4 text-lg font-semibold text-rose-900 dark:text-rose-200">
+        ⚠️ Inmuebles con Cargas Registradas
+      </h2>
+      <div class="space-y-3">
+        @for (property of propertiesWithCharges().slice(0, 20); track property.id) {
+          <div class="rounded-lg border border-rose-300 bg-white p-4 dark:border-rose-700 dark:bg-gray-800">
+            <div class="flex items-start justify-between">
+              <div class="flex-1">
+                <div class="font-semibold text-gray-900 dark:text-white">{{ property.address }}</div>
+                <div class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                  {{ property.city }} | {{ property.propertyRegistry }}
+                </div>
+                <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  Tipo: {{ property.soilType }} | {{ formatNumber(property.area) }} m²
+                </div>
+                @if (property.blockHash && property.blockNumber) {
+                  <div class="mt-1 text-xs text-blue-600 dark:text-blue-400 font-mono">
+                    📋 Hash: {{ formatHash(property.blockHash) }} | Bloque: #{{ property.blockNumber }}
+                  </div>
+                }
+                <div class="mt-2">
+                  <div class="text-xs font-semibold text-rose-600 dark:text-rose-400 mb-1">Cargas:</div>
+                  <ul class="text-xs text-gray-600 dark:text-gray-400 list-disc list-inside">
+                    @for (charge of property.charges; track charge) {
+                      <li>{{ charge }}</li>
+                    }
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+        @if (propertiesWithCharges().length > 20) {
+          <div class="text-center text-sm text-gray-500 dark:text-gray-400">
+            Y {{ propertiesWithCharges().length - 20 }} inmuebles más...
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Tabla de Registros de la Propiedad -->
+  <div class="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+    <div class="border-b border-gray-200 p-4 dark:border-gray-800">
+      <h2 class="text-lg font-semibold text-gray-900 dark:text-white">Registros de la Propiedad (Bookkeepers)</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-50 dark:bg-gray-800/50">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">ID</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Registro</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Ciudad</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Hash Blockchain</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Bloque #</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">Ubicación</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
+          @for (registry of registries(); track registry.id) {
+            <tr class="bg-emerald-50/50 dark:bg-emerald-900/10">
+              <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">{{ registry.id }}</td>
+              <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{{ registry.propertyRegistry }}</td>
+              <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{{ registry.city }}</td>
+              <td class="px-4 py-3 text-sm font-mono text-gray-700 dark:text-gray-300" title="{{ registry.blockHash }}">
+                <span class="text-emerald-600 dark:text-emerald-400">{{ formatHash(registry.blockHash) }}</span>
+              </td>
+              <td class="px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white">#{{ registry.blockNumber }}</td>
+              <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
+                {{ formatNumber(registry.latitude) }}, {{ formatNumber(registry.longitude) }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

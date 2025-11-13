@@ -1,12 +1,14 @@
 {
+  "version": 2,
   "buildCommand": "ng build --configuration production",
   "outputDirectory": "dist/ng-tailadmin",
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "rewrites": [
+  "routes": [
     {
-      "source": "/((?!.*\\.).*)",
-      "destination": "/index.html"
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ],
   "headers": [

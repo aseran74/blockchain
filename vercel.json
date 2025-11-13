@@ -1,9 +1,11 @@
 {
   "buildCommand": "ng build --configuration production",
   "outputDirectory": "dist/ng-tailadmin",
+  "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!.*\\.).*)",
       "destination": "/index.html"
     }
   ],

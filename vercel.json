@@ -1,14 +1,10 @@
 {
-  "version": 2,
   "buildCommand": "ng build --configuration production",
   "outputDirectory": "dist/ng-tailadmin",
-  "routes": [
+  "rewrites": [
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
@@ -40,4 +36,3 @@
     }
   ]
 }
-

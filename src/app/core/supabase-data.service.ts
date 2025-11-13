@@ -378,6 +378,105 @@ export class SupabaseDataService {
     ).pipe(map(this.unwrapResponse));
   }
 
+  // Nuevas funciones para empresas y certificados
+  getCompaniesWithCertificates(): Observable<any[]> {
+    return from(
+      (this.supabase.rpc as any)('get_companies_with_certificates')
+    ).pipe(
+      map((response: any) => {
+        if (response.error) {
+          throw new Error(response.error.message ?? 'Error en Supabase');
+        }
+        return (response.data ?? []) as any[];
+      }),
+      catchError(() => of([]))
+    );
+  }
+
+  getCompanyCertificates(companyId: string): Observable<any[]> {
+    return from(
+      (this.supabase.rpc as any)('get_company_certificates', {
+        p_company_id: companyId
+      })
+    ).pipe(
+      map((response: any) => {
+        if (response.error) {
+          throw new Error(response.error.message ?? 'Error en Supabase');
+        }
+        return (response.data ?? []) as any[];
+      }),
+      catchError(() => of([]))
+    );
+  }
+
+  updateCertificateStatus(
+    certificateId: string,
+    newStatus: 'caducado' | 'no_pagado' | 'fallido' | 'aprobado',
+    paymentStatus?: string,
+    certificationPassed?: boolean
+  ): Observable<any> {
+    return from(
+      (this.supabase.rpc as any)('update_certificate_status', {
+        p_certificate_id: certificateId,
+        p_new_status: newStatus,
+        p_payment_status: paymentStatus || null,
+        p_certification_passed: certificationPassed ?? null
+      })
+    ).pipe(
+      map((response: any) => {
+        if (response.error) {
+          throw new Error(response.error.message ?? 'Error en Supabase');
+        }
+        return response.data ?? {};
+      }),
+      catchError(() => of({ success: false, error: 'Error desconocido' }))
+    );
+  }
+
+  getIssuingBodies(): Observable<any[]> {
+    return from(
+      (this.supabase.from as any)('issuing_bodies')
+        .select('*')
+        .order('name')
+    ).pipe(
+      map((response: any) => {
+        if (response.error) {
+          throw new Error(response.error.message ?? 'Error en Supabase');
+        }
+        return (response.data ?? []) as any[];
+      }),
+      catchError(() => of([]))
+    );
+  }
+
+  getBlockchainStats(): Observable<any> {
+    return from(
+      (this.supabase.rpc as any)('get_blockchain_stats')
+    ).pipe(
+      map((response: any) => {
+        if (response.error) {
+          throw new Error(response.error.message ?? 'Error en Supabase');
+        }
+        return response.data ?? {};
+      }),
+      catchError(() => of({}))
+    );
+  }
+
+  getRecentBlocks(limit: number = 10): Observable<any[]> {
+    return from(
+      (this.supabase.rpc as any)('get_recent_blocks', { limit_count: limit })
+    ).pipe(
+      map((response: any) => {
+        if (response.error) {
+          throw new Error(response.error.message ?? 'Error en Supabase');
+        }
+        return (response.data ?? []) as any[];
+      }),
+      catchError(() => of([]))
+    );
+  }
+
   sendSecondSms() {
     return from(
       this.supabase.rpc('send_second_sms')

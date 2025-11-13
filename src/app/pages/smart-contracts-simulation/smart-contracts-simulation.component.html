@@ -1,10 +1,10 @@
-<section class="space-y-6 p-6">
+<section class="space-y-6 p-4 sm:p-6">
   <header class="space-y-2">
     <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
-      Simulación Smart Contracts
+      Simulación Smart Contracts - Certificados Empresariales
     </h1>
     <p class="text-sm text-gray-500 dark:text-gray-400">
-      Gestión y validación de contratos comerciales de compraventa con certificados e ISOs registrados en blockchain.
+      Gestión de certificados empresariales (ISO, Origen, Inspección) emitidos por organismo certificador con blockchain propia.
     </p>
   </header>
 
@@ -14,232 +14,397 @@
     </div>
   }
 
-  <!-- Estadísticas -->
-  <div class="grid gap-4 md:grid-cols-3">
-    <div class="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-      <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Contratos</div>
-      <div class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">{{ totalContracts() }}</div>
-    </div>
-    <div class="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-      <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Certificados</div>
-      <div class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">{{ totalCertificates() }}</div>
-    </div>
-    <div class="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-      <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Certificados por Contrato</div>
-      <div class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">20</div>
-    </div>
-  </div>
-
-  @if (totalContracts() === 0) {
-    <div class="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-      <div class="flex items-center justify-between">
-        <div>
-          <h2 class="mb-1 text-lg font-semibold text-gray-900 dark:text-white">Inicializar Contratos</h2>
-          <p class="text-sm text-gray-500 dark:text-gray-400">
-            No hay contratos cargados. Haz clic en el botón para inicializar 100 contratos comerciales con 20 certificados/ISOs cada uno.
-          </p>
-        </div>
-        <button
-          (click)="initializeContracts()"
-          [disabled]="loading()"
-          class="rounded-lg bg-blue-500 px-6 py-2 font-semibold text-white transition hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {{ loading() ? 'Inicializando...' : 'Inicializar Contratos' }}
-        </button>
-      </div>
-    </div>
-  }
-
-  @if (totalContracts() > 0) {
-    <!-- Búsqueda y filtros -->
-    <div class="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-      <div class="mb-4">
-        <input
-          type="text"
-          placeholder="Buscar por número de contrato, comprador, vendedor o tipo..."
-          [value]="searchContract()"
-          (input)="searchContract.set($any($event.target).value)"
-          class="w-full rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-        />
-      </div>
-
-      <!-- Lista de contratos -->
-      <div class="space-y-3">
-        <div class="text-sm text-gray-600 dark:text-gray-400">
-          @if (searchContract().trim()) {
-            Buscando: "{{ searchContract() }}" - {{ filteredContracts().length }} resultado(s)
-          }
-          @if (!searchContract().trim()) {
-            Total: {{ totalContracts() }} contratos
-          }
-        </div>
-
-        <div class="max-h-96 space-y-2 overflow-y-auto">
-          @for (contract of filteredContracts(); track contract.id) {
-            <div
-              class="cursor-pointer rounded-lg border-2 p-4 transition"
-              [class.border-blue-500]="selectedContractId() === contract.id"
-              [class.border-gray-200]="selectedContractId() !== contract.id"
-              [class.bg-blue-50]="selectedContractId() === contract.id"
-              [class.bg-white]="selectedContractId() !== contract.id"
-              [class.dark:border-gray-700]="selectedContractId() !== contract.id"
-              [class.dark:bg-gray-800]="selectedContractId() !== contract.id"
-              (click)="selectContract(contract.id)"
-            >
-              <div class="flex items-start justify-between">
-                <div class="flex-1">
-                  <div class="flex items-center gap-3">
-                    <div class="font-semibold text-gray-900 dark:text-white">
-                      {{ contract.contract_number }}
-                    </div>
-                    <span class="rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
-                      {{ contract.status }}
-                    </span>
-                  </div>
-                  <div class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                    <div><strong>Tipo:</strong> {{ contract.contract_type }}</div>
-                    <div><strong>Comprador:</strong> {{ contract.buyer_name }}</div>
-                    <div><strong>Vendedor:</strong> {{ contract.seller_name }}</div>
-                    <div><strong>Monto:</strong> {{ contract.amount | number:'1.2-2' }} {{ contract.currency }}</div>
-                    <div><strong>Certificados:</strong> {{ contract.certificates.length || 0 }} certificados/ISOs</div>
-                  </div>
-                  @if (contract.blockchain_hash) {
-                    <div class="mt-2 text-xs text-gray-500 dark:text-gray-500">
-                      Hash: <span class="font-mono">{{ contract.blockchain_hash.substring(0, 16) }}...</span>
-                      | Bloque #{{ contract.block_number }}
-                    </div>
-                  }
-                </div>
-                <div class="ml-4 text-sm text-gray-500 dark:text-gray-400">
-                  @if (selectedContractId() === contract.id) {
-                    <span class="text-blue-600 dark:text-blue-400">✓ Seleccionado</span>
-                  }
-                </div>
-              </div>
-            </div>
-          }
-        </div>
-      </div>
-    </div>
-
-    <!-- Detalle del contrato seleccionado con certificados -->
-    @if (selectedContract(); as contract) {
-      <div class="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-        <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-          Detalle del Contrato: {{ contract.contract_number }}
-        </h2>
-
-        <!-- Información del contrato -->
-        <div class="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
-          <div class="grid gap-4 md:grid-cols-2">
-            <div>
-              <div class="text-sm font-semibold text-gray-700 dark:text-gray-300">Información del Contrato</div>
-              <div class="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                <div><strong>Tipo:</strong> {{ contract.contract_type }}</div>
-                <div><strong>Comprador:</strong> {{ contract.buyer_name }}</div>
-                <div><strong>Vendedor:</strong> {{ contract.seller_name }}</div>
-                <div><strong>Descripción:</strong> {{ contract.product_description }}</div>
-                <div><strong>Monto:</strong> {{ contract.amount | number:'1.2-2' }} {{ contract.currency }}</div>
-                <div><strong>Fecha Contrato:</strong> {{ contract.contract_date | date:'dd/MM/yyyy' }}</div>
-                @if (contract.delivery_date) {
-                  <div><strong>Fecha Entrega:</strong> {{ contract.delivery_date | date:'dd/MM/yyyy' }}</div>
-                }
-                <div><strong>Estado:</strong> {{ contract.status }}</div>
-              </div>
-            </div>
-            <div>
-              <div class="text-sm font-semibold text-gray-700 dark:text-gray-300">Información Blockchain</div>
-              <div class="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                @if (contract.blockchain_hash) {
-                  <div><strong>Hash:</strong> <span class="font-mono text-xs">{{ contract.blockchain_hash }}</span></div>
-                  <div><strong>Bloque #:</strong> {{ contract.block_number }}</div>
-                }
-                <div><strong>Certificados Totales:</strong> {{ contract.certificates.length || 0 }}</div>
-                <div><strong>Certificados Verificados:</strong> {{ verifiedCertificatesCount() }}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Certificados e ISOs -->
-        <div>
-          <h3 class="mb-3 text-md font-semibold text-gray-900 dark:text-white">
-            Certificados e ISOs ({{ contract.certificates.length || 0 }})
-          </h3>
-          
-          <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-            @for (cert of contract.certificates; track cert.id) {
-              <div
-                class="rounded-lg border-2 p-4"
-                [class]="getValidationClasses(cert.verified ? cert.is_valid : null)"
-              >
-                <div class="mb-2 flex items-start justify-between">
-                  <div class="flex-1">
-                    <div class="font-semibold" [class]="getValidationTextClasses(cert.verified ? cert.is_valid : null)">
-                      {{ cert.certificate_name }}
-                    </div>
-                    <div class="mt-1 text-xs text-gray-600 dark:text-gray-400">
-                      {{ cert.certificate_type }}
-                    </div>
-                  </div>
-                  @if (cert.verified) {
-                    <div class="ml-2">
-                      @if (cert.is_valid) {
-                        <span class="text-green-600 dark:text-green-400">✓</span>
-                      }
-                      @if (!cert.is_valid) {
-                        <span class="text-red-600 dark:text-red-400">✗</span>
-                      }
-                    </div>
-                  }
-                </div>
-                
-                <div class="mt-2 space-y-1 text-xs text-gray-600 dark:text-gray-400">
-                  <div><strong>Número:</strong> {{ cert.certificate_number }}</div>
-                  <div><strong>Organización:</strong> {{ cert.issuing_organization }}</div>
-                  <div><strong>Emisión:</strong> {{ cert.issue_date | date:'dd/MM/yyyy' }}</div>
-                  @if (cert.expiry_date) {
-                    <div><strong>Vencimiento:</strong> {{ cert.expiry_date | date:'dd/MM/yyyy' }}</div>
-                  }
-                  <div><strong>Válido:</strong> {{ cert.is_valid ? 'Sí' : 'No' }}</div>
-                  @if (cert.blockchain_hash) {
-                    <div class="mt-1 break-all font-mono text-xs">
-                      Hash: {{ cert.blockchain_hash.substring(0, 16) }}...
-                    </div>
-                    <div class="text-xs">Bloque #{{ cert.block_number }}</div>
-                  }
-                  @if (cert.verified && cert.verified_at) {
-                    <div class="mt-1 text-xs font-semibold text-blue-600 dark:text-blue-400">
-                      Verificado: {{ cert.verified_at | date:'dd/MM/yyyy HH:mm' }}
-                    </div>
-                  }
-                </div>
-
-                <div class="mt-3">
-                  @if (!cert.verified) {
-                    <button
-                      (click)="validateCertificate(cert.id, $event)"
-                      [disabled]="loading()"
-                      class="w-full rounded-lg bg-indigo-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Validar en Blockchain
-                    </button>
-                  }
-                  @if (cert.verified) {
-                    <div [class]="getVerifiedStatusClasses(cert.is_valid)">
-                      @if (cert.is_valid) {
-                        ✓ Válido y Registrado
-                      }
-                      @if (!cert.is_valid) {
-                        ✗ Inválido o No Registrado
-                      }
-                    </div>
-                  }
+  <!-- Organismo Emisor y Blockchain -->
+  @if (issuingBodies().length > 0) {
+    <div class="rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+      <h2 class="mb-3 text-lg font-semibold text-blue-900 dark:text-blue-200">Organismo Emisor y Blockchain</h2>
+      @for (body of issuingBodies(); track body.id) {
+        <div class="mb-4 space-y-2 text-sm text-blue-800 dark:text-blue-300">
+          <div class="grid gap-2 sm:grid-cols-2">
+            <div><strong>Nombre:</strong> {{ body.name }}</div>
+            <div><strong>Blockchain:</strong> <span class="font-mono font-semibold">{{ body.blockchain_name }}</span></div>
+            <div><strong>País:</strong> {{ body.country }}</div>
+            @if (body.blockchain_hash) {
+              <div>
+                <strong>Hash Principal:</strong>
+                <div class="mt-1 break-all rounded bg-blue-100 p-2 font-mono text-xs dark:bg-blue-900/30">
+                  {{ body.blockchain_hash }}
                 </div>
               </div>
             }
           </div>
+          @if (body.description) {
+            <div class="rounded bg-blue-100 p-2 text-xs italic dark:bg-blue-900/30">{{ body.description }}</div>
+          }
         </div>
+      }
+    </div>
+  }
+
+  <!-- Estadísticas de Blockchain -->
+  @if (blockchainStats().total_blocks) {
+    <div class="rounded-xl border border-purple-200 bg-purple-50 p-4 dark:border-purple-800 dark:bg-purple-900/20">
+      <h2 class="mb-3 text-lg font-semibold text-purple-900 dark:text-purple-200">Estadísticas de la Blockchain</h2>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-lg bg-white p-3 dark:bg-gray-800">
+          <div class="text-xs font-medium text-gray-500 dark:text-gray-400">Total Bloques</div>
+          <div class="mt-1 text-xl font-bold text-gray-900 dark:text-white">{{ blockchainStats().total_blocks }}</div>
+        </div>
+        <div class="rounded-lg bg-white p-3 dark:bg-gray-800">
+          <div class="text-xs font-medium text-gray-500 dark:text-gray-400">Total Certificados</div>
+          <div class="mt-1 text-xl font-bold text-gray-900 dark:text-white">{{ blockchainStats().total_certificates }}</div>
+        </div>
+        <div class="rounded-lg bg-white p-3 dark:bg-gray-800">
+          <div class="text-xs font-medium text-gray-500 dark:text-gray-400">Rango de Bloques</div>
+          <div class="mt-1 text-sm font-semibold text-gray-900 dark:text-white">
+            #{{ blockchainStats().min_block }} - #{{ blockchainStats().max_block }}
+          </div>
+        </div>
+        <div class="rounded-lg bg-white p-3 dark:bg-gray-800">
+          <div class="text-xs font-medium text-gray-500 dark:text-gray-400">Hashes Únicos</div>
+          <div class="mt-1 text-xl font-bold text-gray-900 dark:text-white">{{ blockchainStats().unique_hashes }}</div>
+        </div>
+      </div>
+      
+      @if (blockchainStats().status_distribution && blockchainStats().status_distribution.length > 0) {
+        <div class="mt-4">
+          <h3 class="mb-2 text-sm font-semibold text-purple-900 dark:text-purple-200">Distribución por Estado</h3>
+          <div class="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            @for (dist of blockchainStats().status_distribution; track dist.status) {
+              <div class="rounded-lg bg-white p-2 dark:bg-gray-800">
+                <div class="text-xs font-medium text-gray-500 dark:text-gray-400">{{ getStatusLabel(dist.status as CertificateStatus) }}</div>
+                <div class="mt-1 text-lg font-bold text-gray-900 dark:text-white">{{ dist.count }}</div>
+                <div class="text-xs text-gray-600 dark:text-gray-400">{{ dist.blocks }} bloques</div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Últimos Bloques -->
+  @if (recentBlocks().length > 0) {
+    <div class="rounded-xl border border-indigo-200 bg-indigo-50 p-4 dark:border-indigo-800 dark:bg-indigo-900/20">
+      <h2 class="mb-3 text-lg font-semibold text-indigo-900 dark:text-indigo-200">Últimos Bloques de la Cadena</h2>
+      <div class="space-y-3">
+        @for (block of recentBlocks(); track block.block_number) {
+          <div class="rounded-lg border border-indigo-200 bg-white p-3 dark:border-indigo-700 dark:bg-gray-800">
+            <div class="mb-2 flex flex-wrap items-center gap-2">
+              <span class="rounded-full bg-indigo-100 px-3 py-1 text-sm font-bold text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-200">
+                Bloque #{{ block.block_number }}
+              </span>
+              <span class="text-xs text-gray-600 dark:text-gray-400">
+                {{ block.certificates_count }} certificado(s) | {{ block.companies_count }} empresa(s)
+              </span>
+            </div>
+            <div class="grid gap-2 text-xs sm:grid-cols-2">
+              <div>
+                <strong class="text-gray-700 dark:text-gray-300">Tipos:</strong>
+                <div class="mt-1 flex flex-wrap gap-1">
+                  @for (type of block.certificate_types; track type) {
+                    <span class="rounded bg-indigo-100 px-2 py-0.5 text-xs dark:bg-indigo-900/30">
+                      {{ getCertificateTypeLabel(type as CertificateType) }}
+                    </span>
+                  }
+                </div>
+              </div>
+              <div>
+                <strong class="text-gray-700 dark:text-gray-300">Timestamps:</strong>
+                <div class="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                  Primero: {{ block.first_timestamp | date:'dd/MM/yyyy HH:mm:ss' }}
+                </div>
+                <div class="text-xs text-gray-600 dark:text-gray-400">
+                  Último: {{ block.last_timestamp | date:'dd/MM/yyyy HH:mm:ss' }}
+                </div>
+              </div>
+            </div>
+            @if (block.first_hash || block.last_hash) {
+              <div class="mt-2 space-y-1">
+                @if (block.first_hash) {
+                  <div>
+                    <strong class="text-xs text-gray-700 dark:text-gray-300">Primer Hash:</strong>
+                    <div class="mt-1 break-all rounded bg-gray-100 p-2 font-mono text-xs dark:bg-gray-700">
+                      {{ block.first_hash }}
+                    </div>
+                  </div>
+                }
+                @if (block.last_hash && block.last_hash !== block.first_hash) {
+                  <div>
+                    <strong class="text-xs text-gray-700 dark:text-gray-300">Último Hash:</strong>
+                    <div class="mt-1 break-all rounded bg-gray-100 p-2 font-mono text-xs dark:bg-gray-700">
+                      {{ block.last_hash }}
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Estadísticas -->
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+      <div class="text-xs font-medium text-gray-500 dark:text-gray-400">Total Empresas</div>
+      <div class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{{ totalCompanies() }}</div>
+    </div>
+    <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+      <div class="text-xs font-medium text-gray-500 dark:text-gray-400">Total Certificados</div>
+      <div class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{{ totalCertificates() }}</div>
+    </div>
+    <div class="rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
+      <div class="text-xs font-medium text-green-700 dark:text-green-300">Aprobados</div>
+      <div class="mt-1 text-2xl font-bold text-green-900 dark:text-green-200">{{ totalApproved() }}</div>
+    </div>
+    <div class="rounded-xl border border-orange-200 bg-orange-50 p-4 dark:border-orange-800 dark:bg-orange-900/20">
+      <div class="text-xs font-medium text-orange-700 dark:text-orange-300">Caducados</div>
+      <div class="mt-1 text-2xl font-bold text-orange-900 dark:text-orange-200">{{ totalExpired() }}</div>
+    </div>
+    <div class="rounded-xl border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
+      <div class="text-xs font-medium text-yellow-700 dark:text-yellow-300">No Pagados</div>
+      <div class="mt-1 text-2xl font-bold text-yellow-900 dark:text-yellow-200">{{ totalUnpaid() }}</div>
+    </div>
+  </div>
+
+  @if (totalCompanies() === 0) {
+    <div class="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+      <p class="text-center text-gray-500 dark:text-gray-400">
+        No hay empresas registradas. Los certificados se vincularán automáticamente cuando se inicialicen contratos.
+      </p>
+    </div>
+  }
+
+  @if (totalCompanies() > 0) {
+    <!-- Búsqueda y filtros -->
+    <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+      <div class="mb-4">
+        <input
+          type="text"
+          placeholder="Buscar empresa por nombre, CIF o ciudad..."
+          [value]="searchCompany()"
+          (input)="searchCompany.set($any($event.target).value)"
+          class="w-full rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+        />
+      </div>
+
+      <!-- Lista de empresas -->
+      <div class="space-y-3">
+        <div class="text-sm text-gray-600 dark:text-gray-400">
+          @if (searchCompany().trim()) {
+            Buscando: "{{ searchCompany() }}" - {{ filteredCompanies().length }} resultado(s)
+          }
+          @if (!searchCompany().trim()) {
+            Total: {{ totalCompanies() }} empresas
+          }
+        </div>
+
+        <div class="max-h-96 space-y-2 overflow-y-auto">
+          @for (company of filteredCompanies(); track company.company_id) {
+            <div
+              class="cursor-pointer rounded-lg border-2 p-4 transition"
+              [class.border-blue-500]="selectedCompanyId() === company.company_id"
+              [class.border-gray-200]="selectedCompanyId() !== company.company_id"
+              [class.bg-blue-50]="selectedCompanyId() === company.company_id"
+              [class.bg-white]="selectedCompanyId() !== company.company_id"
+              [class.dark:border-gray-700]="selectedCompanyId() !== company.company_id"
+              [class.dark:bg-gray-800]="selectedCompanyId() !== company.company_id"
+              (click)="selectCompany(company.company_id)"
+            >
+              <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div class="flex-1">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <div class="font-semibold text-gray-900 dark:text-white">
+                      {{ company.company_name }}
+                    </div>
+                    <span class="rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                      {{ company.company_tax_id }}
+                    </span>
+                    <span class="rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
+                      {{ company.company_city }}
+                    </span>
+                  </div>
+                  <div class="mt-2 grid grid-cols-2 gap-2 text-xs text-gray-600 dark:text-gray-400 sm:grid-cols-5">
+                    <div><strong>Total:</strong> {{ company.total_certificates }}</div>
+                    <div class="text-green-600 dark:text-green-400"><strong>Aprobados:</strong> {{ company.approved_certificates }}</div>
+                    <div class="text-orange-600 dark:text-orange-400"><strong>Caducados:</strong> {{ company.expired_certificates }}</div>
+                    <div class="text-yellow-600 dark:text-yellow-400"><strong>No Pagados:</strong> {{ company.unpaid_certificates }}</div>
+                    <div class="text-red-600 dark:text-red-400"><strong>Fallidos:</strong> {{ company.failed_certificates }}</div>
+                  </div>
+                </div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                  @if (selectedCompanyId() === company.company_id) {
+                    <span class="text-blue-600 dark:text-blue-400">✓ Seleccionada</span>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Certificados de la empresa seleccionada -->
+    @if (selectedCompany(); as company) {
+      <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
+        <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+            Certificados de: {{ company.company_name }}
+          </h2>
+          
+          <!-- Filtro de estados -->
+          <div class="flex flex-wrap gap-2">
+            <button
+              (click)="selectedStatusFilter.set('all')"
+              [class.bg-blue-500]="selectedStatusFilter() === 'all'"
+              [class.text-white]="selectedStatusFilter() === 'all'"
+              [class.bg-gray-200]="selectedStatusFilter() !== 'all'"
+              [class.text-gray-700]="selectedStatusFilter() !== 'all'"
+              class="rounded-lg px-3 py-1 text-xs font-semibold transition"
+            >
+              Todos
+            </button>
+            <button
+              (click)="selectedStatusFilter.set('aprobado')"
+              [class.bg-green-500]="selectedStatusFilter() === 'aprobado'"
+              [class.text-white]="selectedStatusFilter() === 'aprobado'"
+              [class.bg-gray-200]="selectedStatusFilter() !== 'aprobado'"
+              [class.text-gray-700]="selectedStatusFilter() !== 'aprobado'"
+              class="rounded-lg px-3 py-1 text-xs font-semibold transition"
+            >
+              Aprobados
+            </button>
+            <button
+              (click)="selectedStatusFilter.set('caducado')"
+              [class.bg-orange-500]="selectedStatusFilter() === 'caducado'"
+              [class.text-white]="selectedStatusFilter() === 'caducado'"
+              [class.bg-gray-200]="selectedStatusFilter() !== 'caducado'"
+              [class.text-gray-700]="selectedStatusFilter() !== 'caducado'"
+              class="rounded-lg px-3 py-1 text-xs font-semibold transition"
+            >
+              Caducados
+            </button>
+            <button
+              (click)="selectedStatusFilter.set('no_pagado')"
+              [class.bg-yellow-500]="selectedStatusFilter() === 'no_pagado'"
+              [class.text-white]="selectedStatusFilter() === 'no_pagado'"
+              [class.bg-gray-200]="selectedStatusFilter() !== 'no_pagado'"
+              [class.text-gray-700]="selectedStatusFilter() !== 'no_pagado'"
+              class="rounded-lg px-3 py-1 text-xs font-semibold transition"
+            >
+              No Pagados
+            </button>
+            <button
+              (click)="selectedStatusFilter.set('fallido')"
+              [class.bg-red-500]="selectedStatusFilter() === 'fallido'"
+              [class.text-white]="selectedStatusFilter() === 'fallido'"
+              [class.bg-gray-200]="selectedStatusFilter() !== 'fallido'"
+              [class.text-gray-700]="selectedStatusFilter() !== 'fallido'"
+              class="rounded-lg px-3 py-1 text-xs font-semibold transition"
+            >
+              Fallidos
+            </button>
+          </div>
+        </div>
+
+        @if (filteredCertificates().length === 0) {
+          <p class="text-center text-gray-500 dark:text-gray-400">
+            No hay certificados que coincidan con el filtro seleccionado.
+          </p>
+        }
+
+        @if (filteredCertificates().length > 0) {
+          <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            @for (cert of filteredCertificates(); track cert.id) {
+              <div
+                class="rounded-lg border-2 p-4"
+                [class]="getStatusClasses(cert.certificate_status)"
+              >
+                <div class="mb-3 flex items-start justify-between">
+                  <div class="flex-1">
+                    <div class="font-semibold" [class]="getStatusTextClasses(cert.certificate_status)">
+                      {{ cert.certificate_name }}
+                    </div>
+                    <div class="mt-1 flex flex-wrap gap-1">
+                      <span class="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
+                        {{ getCertificateTypeLabel(cert.certificate_type_new) }}
+                      </span>
+                      <span class="rounded-full px-2 py-0.5 text-xs font-semibold" [class]="getStatusBadgeClasses(cert.certificate_status)">
+                        {{ getStatusLabel(cert.certificate_status) }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="mt-2 space-y-1 text-xs text-gray-600 dark:text-gray-400">
+                  <div><strong>Número:</strong> {{ cert.certificate_number }}</div>
+                  @if (cert.issuing_body_name) {
+                    <div><strong>Emisor:</strong> {{ cert.issuing_body_name }}</div>
+                  }
+                  @if (cert.blockchain_name) {
+                    <div><strong>Blockchain:</strong> {{ cert.blockchain_name }}</div>
+                  }
+                  <div><strong>Emisión:</strong> {{ cert.issue_date | date:'dd/MM/yyyy' }}</div>
+                  @if (cert.expiry_date) {
+                    <div><strong>Vencimiento:</strong> {{ cert.expiry_date | date:'dd/MM/yyyy' }}</div>
+                  }
+                  <div><strong>Pago:</strong> {{ cert.payment_status }}</div>
+                  <div><strong>Certificación:</strong> {{ cert.certification_passed ? 'Aprobada' : 'Fallida' }}</div>
+                  @if (cert.blockchain_hash) {
+                    <div class="mt-2">
+                      <strong class="text-xs text-gray-700 dark:text-gray-300">Hash Blockchain:</strong>
+                      <div class="mt-1 break-all rounded bg-gray-100 p-2 font-mono text-xs dark:bg-gray-700">
+                        {{ cert.blockchain_hash }}
+                      </div>
+                    </div>
+                    @if (cert.block_number) {
+                      <div class="mt-1 text-xs">
+                        <strong>Bloque:</strong> 
+                        <span class="rounded bg-indigo-100 px-2 py-0.5 font-semibold text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-200">
+                          #{{ cert.block_number }}
+                        </span>
+                      </div>
+                    }
+                  }
+                </div>
+
+                <!-- Botones para cambiar estado -->
+                <div class="mt-4 grid grid-cols-2 gap-2">
+                  <button
+                    (click)="updateCertificateStatus(cert.id, 'aprobado', $event)"
+                    [disabled]="loading() || cert.certificate_status === 'aprobado'"
+                    class="rounded-lg bg-green-500 px-2 py-1 text-xs font-semibold text-white transition hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Aprobado
+                  </button>
+                  <button
+                    (click)="updateCertificateStatus(cert.id, 'caducado', $event)"
+                    [disabled]="loading() || cert.certificate_status === 'caducado'"
+                    class="rounded-lg bg-orange-500 px-2 py-1 text-xs font-semibold text-white transition hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Caducar
+                  </button>
+                  <button
+                    (click)="updateCertificateStatus(cert.id, 'no_pagado', $event)"
+                    [disabled]="loading() || cert.certificate_status === 'no_pagado'"
+                    class="rounded-lg bg-yellow-500 px-2 py-1 text-xs font-semibold text-white transition hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    No Pagado
+                  </button>
+                  <button
+                    (click)="updateCertificateStatus(cert.id, 'fallido', $event)"
+                    [disabled]="loading() || cert.certificate_status === 'fallido'"
+                    class="rounded-lg bg-red-500 px-2 py-1 text-xs font-semibold text-white transition hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Fallido
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        }
       </div>
     }
   }

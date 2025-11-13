@@ -107,19 +107,22 @@ const bootstrap = async () => {
     console.error('URL:', url ? '✓' : '✗');
     console.error('KEY:', key ? '✓' : '✗');
     
-    // Intentar leer desde window.__env como último recurso
-    const windowEnv = (globalThis as unknown as { __env?: Record<string, string | undefined> }).__env;
-    if (windowEnv) {
-      console.log('🔄 Intentando cargar desde window.__env...');
-      assignEnvToGlobals(windowEnv);
+    // Intentar leer desde window.__ENV_CONFIG__ (inyectado en HTML)
+    const windowEnvConfig = (globalThis as unknown as { __ENV_CONFIG__?: Record<string, string | undefined> }).__ENV_CONFIG__;
+    if (windowEnvConfig && Object.keys(windowEnvConfig).length > 0) {
+      console.log('🔄 Intentando cargar desde window.__ENV_CONFIG__...');
+      assignEnvToGlobals(windowEnvConfig);
       const retryUrl = (globalThis as unknown as Record<string, string | undefined>)['NG_APP_SUPABASE_URL'] ||
                       (globalThis as unknown as Record<string, string | undefined>)['SUPABASE_URL'];
       const retryKey = (globalThis as unknown as Record<string, string | undefined>)['NG_APP_SUPABASE_ANON_KEY'] ||
                       (globalThis as unknown as Record<string, string | undefined>)['SUPABASE_ANON_KEY'];
       if (retryUrl && retryKey) {
-        console.log('✅ Variables cargadas desde window.__env');
-        return;
+        console.log('✅ Variables cargadas desde window.__ENV_CONFIG__');
+      } else {
+        console.error('⚠️ window.__ENV_CONFIG__ existe pero no contiene las variables necesarias');
       }
+    } else {
+      console.error('⚠️ window.__ENV_CONFIG__ no está disponible. El script no se inyectó en index.html');
     }
     
     console.error('💡 Asegúrate de configurar las variables en Vercel Dashboard → Settings → Environment Variables');

@@ -46,13 +46,21 @@ if (fs.existsSync(indexHtmlPath)) {
   // Remover script anterior si existe
   indexHtml = indexHtml.replace(/<script[^>]*window\.__ENV_CONFIG__[^<]*<\/script>/gi, '');
   
-  // Crear script inline con las variables
+  // Crear script inline con las variables (debe ejecutarse ANTES de que Angular cargue)
   const envScript = `  <script>
-    window.__ENV_CONFIG__ = ${JSON.stringify(envConfig)};
-    // También asignar a globalThis para compatibilidad
-    if (typeof globalThis !== 'undefined') {
-      Object.assign(globalThis, window.__ENV_CONFIG__);
-    }
+    (function() {
+      window.__ENV_CONFIG__ = ${JSON.stringify(envConfig)};
+      // Asignar directamente a globalThis y window para máxima compatibilidad
+      if (typeof globalThis !== 'undefined') {
+        Object.assign(globalThis, window.__ENV_CONFIG__);
+      }
+      // También asignar individualmente para acceso directo
+      globalThis.NG_APP_SUPABASE_URL = window.__ENV_CONFIG__.NG_APP_SUPABASE_URL;
+      globalThis.NG_APP_SUPABASE_ANON_KEY = window.__ENV_CONFIG__.NG_APP_SUPABASE_ANON_KEY;
+      globalThis.SUPABASE_URL = window.__ENV_CONFIG__.SUPABASE_URL;
+      globalThis.SUPABASE_ANON_KEY = window.__ENV_CONFIG__.SUPABASE_ANON_KEY;
+      console.log('🔧 Variables de entorno inyectadas en HTML:', Object.keys(window.__ENV_CONFIG__).join(', '));
+    })();
   </script>`;
   
   // Insertar antes del cierre de </head>

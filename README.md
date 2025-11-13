@@ -1,6 +1,5 @@
 # 🚀 Votalia - Plataforma PPoV (Proof-of-Vote)
 
-![Votalia Logo](./angular-tailwind.png)
 
 **Votalia** es una plataforma completa de demostración del protocolo **PnV (Proof-of-Vote)**, un nuevo modelo de consenso blockchain que combina votación y prueba de participación, permitiendo que múltiples nodos generen bloques en paralelo dentro de la misma ronda de consenso.
 

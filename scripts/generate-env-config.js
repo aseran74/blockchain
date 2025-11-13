@@ -35,8 +35,36 @@ if (!fs.existsSync(outputDir)) {
   fs.mkdirSync(outputDir, { recursive: true });
 }
 
-// Escribir archivo
+// Escribir archivo JSON
 fs.writeFileSync(outputFile, JSON.stringify(envConfig, null, 2), 'utf8');
+
+// También inyectar las variables directamente en index.html como script inline
+const indexHtmlPath = path.join(__dirname, '..', 'src', 'index.html');
+if (fs.existsSync(indexHtmlPath)) {
+  let indexHtml = fs.readFileSync(indexHtmlPath, 'utf8');
+  
+  // Remover script anterior si existe
+  indexHtml = indexHtml.replace(/<script[^>]*window\.__ENV_CONFIG__[^<]*<\/script>/gi, '');
+  
+  // Crear script inline con las variables
+  const envScript = `  <script>
+    window.__ENV_CONFIG__ = ${JSON.stringify(envConfig)};
+    // También asignar a globalThis para compatibilidad
+    if (typeof globalThis !== 'undefined') {
+      Object.assign(globalThis, window.__ENV_CONFIG__);
+    }
+  </script>`;
+  
+  // Insertar antes del cierre de </head>
+  if (indexHtml.includes('</head>')) {
+    indexHtml = indexHtml.replace('</head>', `${envScript}\n</head>`);
+  } else if (indexHtml.includes('<app-root>')) {
+    indexHtml = indexHtml.replace('<app-root>', `${envScript}\n  <app-root>`);
+  }
+  
+  fs.writeFileSync(indexHtmlPath, indexHtml, 'utf8');
+  console.log('✅ Variables inyectadas en index.html');
+}
 
 console.log('✅ env-config.json generado exitosamente');
 console.log('📁 Ubicación:', outputFile);

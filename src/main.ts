@@ -47,6 +47,16 @@ const assignEnvToGlobals = (source: Record<string, string | undefined> = {}) => 
 };
 
 const loadRuntimeEnv = async (): Promise<void> => {
+  // Primero intentar cargar desde window.__ENV_CONFIG__ (inyectado en index.html)
+  const windowEnvConfig = (globalThis as unknown as { __ENV_CONFIG__?: Record<string, string | undefined> }).__ENV_CONFIG__;
+  if (windowEnvConfig && Object.keys(windowEnvConfig).length > 0) {
+    assignEnvToGlobals(windowEnvConfig);
+    console.log('✅ Variables de entorno cargadas desde window.__ENV_CONFIG__ (inyectadas en HTML)');
+    console.log('📋 Variables disponibles:', Object.keys(windowEnvConfig).join(', '));
+    return;
+  }
+  
+  // Si no están en window, intentar cargar desde env-config.json
   try {
     const response = await fetch('/env-config.json', { cache: 'no-cache' });
     if (!response.ok) {
@@ -62,8 +72,7 @@ const loadRuntimeEnv = async (): Promise<void> => {
       console.warn('⚠️ env-config.json está vacío o no contiene variables');
     }
   } catch (error) {
-    console.error('❌ Error al cargar env-config.json:', error);
-    console.warn('💡 Verifica que el archivo exista y que las variables estén configuradas en Vercel');
+    console.warn('⚠️ No se pudo cargar env-config.json, intentando usar variables del build');
   }
 };
 

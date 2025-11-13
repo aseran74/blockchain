@@ -2,6 +2,7 @@
   "version": 2,
   "buildCommand": "ng build --configuration production",
   "outputDirectory": "dist/ng-tailadmin/browser",
+  "framework": null,
   "routes": [
     {
       "handle": "filesystem"

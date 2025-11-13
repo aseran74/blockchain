@@ -1,6 +1,6 @@
 {
   "buildCommand": "ng build --configuration production",
-  "outputDirectory": "dist/ng-tailadmin",
+  "outputDirectory": "dist/ng-tailadmin/browser",
   "rewrites": [
     {
       "source": "/(.*)",

@@ -3,7 +3,7 @@
   "outputDirectory": "dist/ng-tailadmin/browser",
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!env-config\\.json|.*\\..*).*)",
       "destination": "/index.html"
     }
   ],

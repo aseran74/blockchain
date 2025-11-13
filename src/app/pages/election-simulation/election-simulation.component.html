@@ -1,9 +1,9 @@
-<section class="space-y-6 p-6">
+<section class="space-y-4 p-4 sm:space-y-6 sm:p-6">
   <header class="space-y-2">
-    <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">
+    <h1 class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
       Simulador de Elecciones - Fases 1-5
     </h1>
-    <p class="text-sm text-gray-500 dark:text-gray-400">
+    <p class="text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
       Selecciona un votante, registra su voto, envía SMS y obtén resultados totales.
     </p>
   </header>
@@ -34,21 +34,21 @@
     </div>
   }
 
-  <div class="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-    <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Fase 1: Seleccionar o Crear Votante</h2>
+  <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900 sm:p-6">
+    <h2 class="mb-4 text-base font-semibold text-gray-900 dark:text-white sm:text-lg">Fase 1: Seleccionar o Crear Votante</h2>
     
     <div class="space-y-4">
-      <div class="flex gap-2">
+      <div class="flex flex-col gap-2 sm:flex-row">
         <input
           type="text"
           placeholder="Buscar por nombre, apellido o DNI..."
           [value]="searchName()"
           (input)="searchName.set($any($event.target).value)"
-          class="flex-1 rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+          class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:px-4"
         />
         <button
           (click)="toggleCreateForm()"
-          class="rounded-lg bg-emerald-500 px-4 py-2 font-semibold text-white transition hover:bg-emerald-600"
+          class="w-full rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-600 sm:w-auto"
         >
           {{ showCreateForm() ? 'Cancelar' : 'Crear Nuevo' }}
         </button>
@@ -150,16 +150,18 @@
           <div class="max-h-96 overflow-y-auto rounded-lg border border-gray-200 dark:border-gray-700">
             @if (filteredVoters().length > 0) {
               @for (voter of filteredVoters(); track voter.id) {
-                <div class="flex items-start gap-3 border-b border-gray-200 p-3 transition hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                <div class="flex flex-col gap-2 border-b border-gray-200 p-3 transition hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800 sm:flex-row sm:items-start sm:gap-3"
                      [class.bg-blue-50]="selectedVoterId() === voter.id">
-                  <div class="flex-1">
-                    <div class="font-semibold text-gray-900 dark:text-white">
+                  <div class="flex-1 min-w-0">
+                    <div class="font-semibold text-sm text-gray-900 dark:text-white sm:text-base">
                       {{ voter.nombre }} {{ voter.apellido }}
                     </div>
-                    <div class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                      DNI: {{ voter.dni }} | Tel: {{ voter.telefono }}
+                    <div class="mt-1 text-xs text-gray-600 dark:text-gray-400 sm:text-sm">
+                      <span class="block sm:inline">DNI: {{ voter.dni }}</span>
+                      <span class="hidden sm:inline"> | </span>
+                      <span class="block sm:inline">Tel: {{ voter.telefono }}</span>
                     </div>
-                    <div class="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                    <div class="mt-1 text-xs text-gray-500 dark:text-gray-500 line-clamp-2">
                       {{ voter.direccion }}
                     </div>
                     @if (voter.voted) {
@@ -168,13 +170,13 @@
                       </div>
                     }
                   </div>
-                  <div class="flex gap-2">
+                  <div class="flex gap-2 sm:flex-shrink-0">
                     <button
                       (click)="selectVoter(voter.id); $event.stopPropagation()"
                       [disabled]="loading()"
                       [class.bg-blue-500]="selectedVoterId() === voter.id"
                       [class.bg-blue-400]="selectedVoterId() !== voter.id"
-                      class="rounded-lg px-3 py-1 text-xs font-semibold text-white transition hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                      class="flex-1 rounded-lg px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed sm:flex-none"
                     >
                       {{ selectedVoterId() === voter.id ? '✓ Seleccionado' : 'Seleccionar' }}
                     </button>
@@ -182,7 +184,7 @@
                       <button
                         (click)="deleteVote(voter.id, $event)"
                         [disabled]="loading()"
-                        class="rounded-lg bg-red-500 px-3 py-1 text-xs font-semibold text-white transition hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex-1 rounded-lg bg-red-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed sm:flex-none"
                       >
                         Borrar
                       </button>
@@ -236,12 +238,12 @@
           Selecciona el partido por el que desea votar {{ voter.nombre }} {{ voter.apellido }}:
         </p>
         
-        <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           @for (party of parties; track party) {
             <button
               (click)="registerVote(party, 'online')"
               [disabled]="loading()"
-              class="rounded-lg border-2 border-gray-300 bg-white px-6 py-4 text-center font-semibold transition hover:border-blue-500 hover:bg-blue-50 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:border-blue-400 dark:hover:bg-blue-900/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="rounded-lg border-2 border-gray-300 bg-white px-4 py-3 text-center text-sm font-semibold transition hover:border-blue-500 hover:bg-blue-50 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:border-blue-400 dark:hover:bg-blue-900/20 disabled:opacity-50 disabled:cursor-not-allowed sm:px-6 sm:py-4 sm:text-base"
             >
               {{ party }}
             </button>
@@ -284,15 +286,15 @@
                 <div class="text-gray-700 dark:text-gray-300">{{ sms.sms_message }}</div>
               </div>
 
-              <div class="grid gap-3 md:grid-cols-2">
+              <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div class="rounded bg-white p-3 dark:bg-gray-800">
                   <div class="mb-1 text-xs font-semibold text-gray-600 dark:text-gray-400">Código SMS:</div>
-                  <div class="font-mono text-lg font-bold text-gray-900 dark:text-white">{{ sms.sms_code }}</div>
+                  <div class="break-all font-mono text-base font-bold text-gray-900 dark:text-white sm:text-lg">{{ sms.sms_code }}</div>
                 </div>
                 
                 <div class="rounded bg-white p-3 dark:bg-gray-800">
                   <div class="mb-1 text-xs font-semibold text-gray-600 dark:text-gray-400">Clave Encriptación:</div>
-                  <div class="font-mono text-lg font-bold text-gray-900 dark:text-white">{{ sms.encryption_key }}</div>
+                  <div class="break-all font-mono text-base font-bold text-gray-900 dark:text-white sm:text-lg">{{ sms.encryption_key }}</div>
                 </div>
               </div>
 

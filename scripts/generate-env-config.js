@@ -1,9 +1,35 @@
 const fs = require('fs');
 const path = require('path');
 
-// Leer variables de entorno de Vercel
-const supabaseUrl = process.env.NG_APP_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.NG_APP_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+// Función para cargar variables desde archivo .env
+const loadEnvFile = (envPath) => {
+  if (!fs.existsSync(envPath)) return {};
+  const content = fs.readFileSync(envPath, 'utf8');
+  const env = {};
+  content.split('\n').forEach(line => {
+    const trimmed = line.trim();
+    if (trimmed && !trimmed.startsWith('#')) {
+      const [key, ...valueParts] = trimmed.split('=');
+      if (key && valueParts.length > 0) {
+        env[key.trim()] = valueParts.join('=').trim().replace(/^["']|["']$/g, '');
+      }
+    }
+  });
+  return env;
+};
+
+// Cargar variables desde .env si existe (desarrollo local)
+const localEnv = loadEnvFile(path.join(__dirname, '..', '.env'));
+
+// Leer variables de entorno (prioridad: process.env > .env file)
+const supabaseUrl = process.env.NG_APP_SUPABASE_URL || 
+                    process.env.SUPABASE_URL || 
+                    localEnv.NG_APP_SUPABASE_URL || 
+                    localEnv.SUPABASE_URL;
+const supabaseAnonKey = process.env.NG_APP_SUPABASE_ANON_KEY || 
+                        process.env.SUPABASE_ANON_KEY || 
+                        localEnv.NG_APP_SUPABASE_ANON_KEY || 
+                        localEnv.SUPABASE_ANON_KEY;
 
 // Log para debugging
 console.log('🔍 Verificando variables de entorno...');

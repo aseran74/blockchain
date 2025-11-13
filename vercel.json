@@ -1,15 +1,10 @@
 {
-  "version": 2,
   "buildCommand": "npm run prebuild && ng build --configuration production",
   "outputDirectory": "dist/ng-tailadmin/browser",
-  "framework": null,
-  "routes": [
+  "rewrites": [
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [

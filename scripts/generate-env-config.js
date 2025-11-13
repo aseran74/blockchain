@@ -5,10 +5,16 @@ const path = require('path');
 const supabaseUrl = process.env.NG_APP_SUPABASE_URL || process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.NG_APP_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
 
+// Log para debugging
+console.log('🔍 Verificando variables de entorno...');
+console.log('NG_APP_SUPABASE_URL:', supabaseUrl ? '✓ Encontrada' : '✗ No encontrada');
+console.log('NG_APP_SUPABASE_ANON_KEY:', supabaseAnonKey ? '✓ Encontrada' : '✗ No encontrada');
+
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error('❌ Error: Variables de entorno no encontradas');
   console.error('NG_APP_SUPABASE_URL:', supabaseUrl ? '✓' : '✗');
   console.error('NG_APP_SUPABASE_ANON_KEY:', supabaseAnonKey ? '✓' : '✗');
+  console.error('💡 Asegúrate de configurar las variables en Vercel Dashboard → Settings → Environment Variables');
   process.exit(1);
 }
 

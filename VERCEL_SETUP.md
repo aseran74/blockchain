@@ -11,9 +11,20 @@ En el dashboard de Vercel, configura las siguientes variables de entorno:
 
 1. Ve a tu proyecto en Vercel Dashboard
 2. Settings → Environment Variables
-3. Agrega las variables:
+3. Agrega las variables para **Production**, **Preview** y **Development**:
    - `NG_APP_SUPABASE_URL` = `https://yqixbognyxgpjuzzrefo.supabase.co`
    - `NG_APP_SUPABASE_ANON_KEY` = (tu clave anónima de Supabase)
+4. **IMPORTANTE**: Después de agregar las variables, realiza un nuevo deployment para que surtan efecto
+
+### Verificación:
+
+Después del deployment, verifica en los logs de build que aparezca:
+```
+🔍 Verificando variables de entorno...
+NG_APP_SUPABASE_URL: ✓ Encontrada
+NG_APP_SUPABASE_ANON_KEY: ✓ Encontrada
+✅ env-config.json generado exitosamente
+```
 
 ## Build Command
 

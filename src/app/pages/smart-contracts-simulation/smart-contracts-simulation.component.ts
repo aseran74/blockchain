@@ -304,7 +304,7 @@ export class SmartContractsSimulationComponent implements OnInit {
     }
   }
 
-  getCertificateTypeLabel(type: CertificateType): string {
+  getCertificateTypeLabel(type: CertificateType | string): string {
     switch (type) {
       case 'ISO':
         return 'ISO';
@@ -313,7 +313,7 @@ export class SmartContractsSimulationComponent implements OnInit {
       case 'inspeccion':
         return 'Inspección';
       default:
-        return type;
+        return type as string;
     }
   }
 

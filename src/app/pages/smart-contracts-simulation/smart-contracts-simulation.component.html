@@ -104,7 +104,7 @@
                 <div class="mt-1 flex flex-wrap gap-1">
                   @for (type of block.certificate_types; track type) {
                     <span class="rounded bg-indigo-100 px-2 py-0.5 text-xs dark:bg-indigo-900/30">
-                      {{ getCertificateTypeLabel(type as CertificateType) }}
+                      {{ getCertificateTypeLabel(type) }}
                     </span>
                   }
                 </div>

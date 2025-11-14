@@ -49,6 +49,10 @@ export class AppSidebarComponent {
         { name: "Nodos y roles", path: "/nodes" },
         { name: "Parámetros", path: "/parameters" },
         { name: "Wallet Votalia", path: "/wallets" },
+        { name: "Simulación Solar", path: "/solar-simulation" },
+        { name: "Simulador Notaría", path: "/notary-simulation" },
+        { name: "Simulador Elecciones", path: "/election-simulation" },
+        { name: "Simulación Smart Contracts", path: "/smart-contracts-simulation" },
       ],
     },
     {

@@ -10,6 +10,10 @@ import { ParametersComponent } from './pages/parameters/parameters.component';
 import { GlobalTpsComponent } from './pages/insights/global-tps/global-tps.component';
 import { WalletsComponent } from './pages/wallets/wallets.component';
 import { HomeComponent } from './pages/home/home.component';
+import { SolarSimulationComponent } from './pages/solar-simulation/solar-simulation.component';
+import { NotarySimulationComponent } from './pages/notary-simulation/notary-simulation.component';
+import { ElectionSimulationComponent } from './pages/election-simulation/election-simulation.component';
+import { SmartContractsSimulationComponent } from './pages/smart-contracts-simulation/smart-contracts-simulation.component';
 
 export const routes: Routes = [
   {
@@ -61,6 +65,26 @@ export const routes: Routes = [
         path: 'global-tps',
         component: GlobalTpsComponent,
         title: 'Proyección TPS mundial | Votalia',
+      },
+      {
+        path: 'solar-simulation',
+        component: SolarSimulationComponent,
+        title: 'Simulación Paneles Solares | Votalia',
+      },
+      {
+        path: 'notary-simulation',
+        component: NotarySimulationComponent,
+        title: 'Simulador Notaría y Registro | Votalia',
+      },
+      {
+        path: 'election-simulation',
+        component: ElectionSimulationComponent,
+        title: 'Simulador Elecciones | Votalia',
+      },
+      {
+        path: 'smart-contracts-simulation',
+        component: SmartContractsSimulationComponent,
+        title: 'Simulación Smart Contracts | Votalia',
       },
       {
         path: '',

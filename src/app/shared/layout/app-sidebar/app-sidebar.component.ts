@@ -49,6 +49,12 @@ export class AppSidebarComponent {
         { name: "Nodos y roles", path: "/nodes" },
         { name: "Parámetros", path: "/parameters" },
         { name: "Wallet Votalia", path: "/wallets" },
+      ],
+    },
+    {
+      icon: `<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.75 2C8.50736 2 7.5 3.00736 7.5 4.25V19.75C7.5 20.9926 8.50736 22 9.75 22H14.25C15.4926 22 16.5 20.9926 16.5 19.75V4.25C16.5 3.00736 15.4926 2 14.25 2H9.75ZM9 4.25C9 4.08579 9.08579 4 9.25 4H14.25C14.4142 4 14.5 4.08579 14.5 4.25V19.75C14.5 19.9142 14.4142 20 14.25 20H9.25C9.08579 20 9 19.9142 9 19.75V4.25Z" fill="currentColor"></path><path d="M10.5 6.5C10.5 6.08579 10.8358 5.75 11.25 5.75H12.75C13.1642 5.75 13.5 6.08579 13.5 6.5C13.5 6.91421 13.1642 7.25 12.75 7.25H11.25C10.8358 7.25 10.5 6.91421 10.5 6.5Z" fill="currentColor"></path><path d="M11.25 9.25C10.8358 9.25 10.5 9.58579 10.5 10C10.5 10.4142 10.8358 10.75 11.25 10.75H12.75C13.1642 10.75 13.5 10.4142 13.5 10C13.5 9.58579 13.1642 9.25 12.75 9.25H11.25Z" fill="currentColor"></path><path d="M10.5 13.5C10.5 13.0858 10.8358 12.75 11.25 12.75H12.75C13.1642 12.75 13.5 13.0858 13.5 13.5C13.5 13.9142 13.1642 14.25 12.75 14.25H11.25C10.8358 14.25 10.5 13.9142 10.5 13.5Z" fill="currentColor"></path><path d="M11.25 16.25C10.8358 16.25 10.5 16.5858 10.5 17C10.5 17.4142 10.8358 17.75 11.25 17.75H12.75C13.1642 17.75 13.5 17.4142 13.5 17C13.5 16.5858 13.1642 16.25 12.75 16.25H11.25Z" fill="currentColor"></path></svg>`,
+      name: "Simulaciones",
+      subItems: [
         { name: "Simulación Solar", path: "/solar-simulation" },
         { name: "Simulador Notaría", path: "/notary-simulation" },
         { name: "Simulador Elecciones", path: "/election-simulation" },

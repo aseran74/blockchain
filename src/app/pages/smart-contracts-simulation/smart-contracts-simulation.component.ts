@@ -317,7 +317,7 @@ export class SmartContractsSimulationComponent implements OnInit {
     }
   }
 
-  getStatusLabel(status: CertificateStatus): string {
+  getStatusLabel(status: CertificateStatus | string): string {
     switch (status) {
       case 'aprobado':
         return 'Aprobado';
@@ -328,7 +328,7 @@ export class SmartContractsSimulationComponent implements OnInit {
       case 'fallido':
         return 'Fallido';
       default:
-        return status;
+        return status as string;
     }
   }
 }
